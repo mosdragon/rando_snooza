@@ -1,0 +1,403 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1EFD938556F2519C091F486D /* SoundPoolPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5776D8D1B2B897A6AFC8B2A /* SoundPoolPickerView.swift */; };
+		225EC8CCFB9F31E29FB2000F /* AudioLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E63471558531D981667ADB /* AudioLibraryManager.swift */; };
+		23878E0F1A9A2081476CE2F5 /* AudioProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */; };
+		3B9DF3E20B0F4D9B09DF0ED0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90D88415C402AAD1D16777C3 /* Extensions.swift */; };
+		69228D4D6A00F6B906F58309 /* AlarmScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */; };
+		75EC1FCAA9A1C435B846532D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */; };
+		79A45A0F74355676736195B5 /* AlarmEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D63279D316D82BA5510614 /* AlarmEditView.swift */; };
+		A58607F7DC6B733AFFCB3992 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */; };
+		A692EEEB6565CE1C70762FEB /* Alarm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C57498F95D078E486D86251 /* Alarm.swift */; };
+		AAB3DCFB407BB91136F1075A /* AudioFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5515C7C6D2845B0F835821 /* AudioFile.swift */; };
+		C74366E614817032FAEFAC09 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1895206D235B759C6C3F5489 /* RootTabView.swift */; };
+		D81A1D54A1197DB0C03101DC /* AudioLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5932E983DFC8BEB7098E98 /* AudioLibraryView.swift */; };
+		E0F683C63B6D392920F6FA90 /* RandomizationRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485ABCBF76AAE33AC314E38C /* RandomizationRangeView.swift */; };
+		E631354A819A5AD69569B88A /* RandomizerAlarmClockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */; };
+		F441C21EC22BC54A8486074E /* AlarmListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6440466ACC0F2B398BC06B /* AlarmListView.swift */; };
+		F72F38888C2CDE2F0EC0F081 /* RepeatDayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessor.swift; sourceTree = "<group>"; };
+		0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmScheduler.swift; sourceTree = "<group>"; };
+		1895206D235B759C6C3F5489 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		31D63279D316D82BA5510614 /* AlarmEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmEditView.swift; sourceTree = "<group>"; };
+		485ABCBF76AAE33AC314E38C /* RandomizationRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizationRangeView.swift; sourceTree = "<group>"; };
+		4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatDayPicker.swift; sourceTree = "<group>"; };
+		5C57498F95D078E486D86251 /* Alarm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alarm.swift; sourceTree = "<group>"; };
+		657DB9EF8551BF6416EDA683 /* RandomizerAlarmClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RandomizerAlarmClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizerAlarmClockApp.swift; sourceTree = "<group>"; };
+		71E63471558531D981667ADB /* AudioLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryManager.swift; sourceTree = "<group>"; };
+		90D88415C402AAD1D16777C3 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
+		BA6440466ACC0F2B398BC06B /* AlarmListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmListView.swift; sourceTree = "<group>"; };
+		C5776D8D1B2B897A6AFC8B2A /* SoundPoolPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPoolPickerView.swift; sourceTree = "<group>"; };
+		DB5932E983DFC8BEB7098E98 /* AudioLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryView.swift; sourceTree = "<group>"; };
+		EE5515C7C6D2845B0F835821 /* AudioFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFile.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3CF389114F77D5524DA35684 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */,
+				7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		5ABF25AA2ACEC47278EA655B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				657DB9EF8551BF6416EDA683 /* RandomizerAlarmClock.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6646AC0C2683CE990B516708 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */,
+				71E63471558531D981667ADB /* AudioLibraryManager.swift */,
+				06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AD8C6CF18D5F10583D878968 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				485ABCBF76AAE33AC314E38C /* RandomizationRangeView.swift */,
+				9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */,
+				4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */,
+				C5776D8D1B2B897A6AFC8B2A /* SoundPoolPickerView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		BAA5F2A639E516513B5D4C6F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5C57498F95D078E486D86251 /* Alarm.swift */,
+				EE5515C7C6D2845B0F835821 /* AudioFile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		CC6FAFFCA37439ABBFE4F5D5 /* RandomizerAlarmClock */ = {
+			isa = PBXGroup;
+			children = (
+				3CF389114F77D5524DA35684 /* App */,
+				BAA5F2A639E516513B5D4C6F /* Models */,
+				6646AC0C2683CE990B516708 /* Services */,
+				E26BD706BFD6D728FB84AF41 /* Utilities */,
+				CD8AB091517D573D85887A75 /* Views */,
+			);
+			path = RandomizerAlarmClock;
+			sourceTree = "<group>";
+		};
+		CD8AB091517D573D85887A75 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				31D63279D316D82BA5510614 /* AlarmEditView.swift */,
+				BA6440466ACC0F2B398BC06B /* AlarmListView.swift */,
+				DB5932E983DFC8BEB7098E98 /* AudioLibraryView.swift */,
+				1895206D235B759C6C3F5489 /* RootTabView.swift */,
+				AD8C6CF18D5F10583D878968 /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E26BD706BFD6D728FB84AF41 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				90D88415C402AAD1D16777C3 /* Extensions.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		F2E3AC8F83AB2EE99244D2CB = {
+			isa = PBXGroup;
+			children = (
+				CC6FAFFCA37439ABBFE4F5D5 /* RandomizerAlarmClock */,
+				5ABF25AA2ACEC47278EA655B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A1FC708E888370CCA00C8F5 /* RandomizerAlarmClock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E706F0F868DF0E11BC148EE8 /* Build configuration list for PBXNativeTarget "RandomizerAlarmClock" */;
+			buildPhases = (
+				A51F28BDD3A30D1CB923832F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RandomizerAlarmClock;
+			packageProductDependencies = (
+			);
+			productName = RandomizerAlarmClock;
+			productReference = 657DB9EF8551BF6416EDA683 /* RandomizerAlarmClock.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		531CAD395CE3DCE10D3FED77 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					6A1FC708E888370CCA00C8F5 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 654AB0DBE2F8171D7EBC08D4 /* Build configuration list for PBXProject "RandomizerAlarmClock" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F2E3AC8F83AB2EE99244D2CB;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5ABF25AA2ACEC47278EA655B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A1FC708E888370CCA00C8F5 /* RandomizerAlarmClock */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A51F28BDD3A30D1CB923832F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A692EEEB6565CE1C70762FEB /* Alarm.swift in Sources */,
+				79A45A0F74355676736195B5 /* AlarmEditView.swift in Sources */,
+				F441C21EC22BC54A8486074E /* AlarmListView.swift in Sources */,
+				69228D4D6A00F6B906F58309 /* AlarmScheduler.swift in Sources */,
+				75EC1FCAA9A1C435B846532D /* AppDelegate.swift in Sources */,
+				AAB3DCFB407BB91136F1075A /* AudioFile.swift in Sources */,
+				225EC8CCFB9F31E29FB2000F /* AudioLibraryManager.swift in Sources */,
+				D81A1D54A1197DB0C03101DC /* AudioLibraryView.swift in Sources */,
+				23878E0F1A9A2081476CE2F5 /* AudioProcessor.swift in Sources */,
+				3B9DF3E20B0F4D9B09DF0ED0 /* Extensions.swift in Sources */,
+				E0F683C63B6D392920F6FA90 /* RandomizationRangeView.swift in Sources */,
+				E631354A819A5AD69569B88A /* RandomizerAlarmClockApp.swift in Sources */,
+				A58607F7DC6B733AFFCB3992 /* RangeSlider.swift in Sources */,
+				F72F38888C2CDE2F0EC0F081 /* RepeatDayPicker.swift in Sources */,
+				C74366E614817032FAEFAC09 /* RootTabView.swift in Sources */,
+				1EFD938556F2519C091F486D /* SoundPoolPickerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2F6AB069402BBD9B9D8B9880 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		33DCAF96D7F6E869E0808266 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 94CJ2KL5G5;
+				INFOPLIST_FILE = RandomizerAlarmClock/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.RandomizerAlarmClock;
+				PRODUCT_NAME = RandomizerAlarmClock;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		3CA56507F3AA98A1C6C38EAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 94CJ2KL5G5;
+				INFOPLIST_FILE = RandomizerAlarmClock/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.RandomizerAlarmClock;
+				PRODUCT_NAME = RandomizerAlarmClock;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C6E7A9132FA3D345F3292EA9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		654AB0DBE2F8171D7EBC08D4 /* Build configuration list for PBXProject "RandomizerAlarmClock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C6E7A9132FA3D345F3292EA9 /* Debug */,
+				2F6AB069402BBD9B9D8B9880 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E706F0F868DF0E11BC148EE8 /* Build configuration list for PBXNativeTarget "RandomizerAlarmClock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3CA56507F3AA98A1C6C38EAC /* Debug */,
+				33DCAF96D7F6E869E0808266 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 531CAD395CE3DCE10D3FED77 /* Project object */;
+}
