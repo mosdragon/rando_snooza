@@ -80,10 +80,15 @@ struct AlarmListView: View {
     }
 
     private func delete(at offsets: IndexSet) {
-        for index in offsets {
+        for index in offsets where index < alarms.count {
             let alarm = alarms[index]
             AlarmScheduler.cancelPending(for: alarm)
             modelContext.delete(alarm)
+        }
+        do {
+            try modelContext.save()
+        } catch {
+            AlarmScheduler.log.error("Deleting alarm(s) failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 }

@@ -9,6 +9,7 @@
 
 import Foundation
 import AVFoundation
+import os
 
 enum AudioProcessorError: Error, LocalizedError {
     case couldNotOpenInput
@@ -26,7 +27,10 @@ enum AudioProcessorError: Error, LocalizedError {
 
 struct AudioProcessor {
 
+    static let log = Logger(subsystem: "com.personal.RandomizerAlarmClock", category: "audio")
+
     /// iOS requires notification sounds to be at most 30 seconds; stay comfortably under that.
+    /// This is a limit on the *rendered output*, not on the source material.
     static let maxRenderedDuration: Double = 28.0
 
     /// Picks a random pitch (in cents) and speed (rate multiplier) within an alarm's configured
@@ -68,9 +72,20 @@ struct AudioProcessor {
             throw AudioProcessorError.renderSetupFailed
         }
 
-        // Trim the *input* to maxRenderedDuration worth of source frames before any speed change,
-        // so a very long source file doesn't take forever to schedule.
-        let inputFramesToSchedule = AVAudioFrameCount(min(Double(inputFile.length), maxRenderedDuration * sampleRate))
+        // BUG FIX: this used to trim the *input* to maxRenderedDuration of source frames,
+        // ignoring the rate. At the default speedMin of 0.85x, 28s of source stretches to
+        // 28 / 0.85 = ~32.9s of output — over iOS's hard 30-second notification-sound
+        // limit, at which point iOS discards the custom sound and plays the default one
+        // (or nothing, depending on settings). Budget the trim in *output* time instead:
+        // outputDuration = inputDuration / rate, so inputDuration = maxRenderedDuration * rate.
+        let effectiveRate = Double(pitchUnit.rate)
+        let maxInputSeconds = maxRenderedDuration * effectiveRate
+        let inputFramesToSchedule = AVAudioFrameCount(min(Double(inputFile.length), maxInputSeconds * sampleRate))
+
+        guard inputFramesToSchedule > 0 else {
+            log.error("Input file has no usable audio frames: \(inputURL.lastPathComponent, privacy: .public)")
+            throw AudioProcessorError.couldNotOpenInput
+        }
 
         do {
             try engine.start()
@@ -90,7 +105,10 @@ struct AudioProcessor {
         // Speed changes tempo without changing duration of *source* frames consumed per unit of
         // output time, so the number of output frames we need is the scheduled input duration
         // divided by rate (a faster rate compresses the same material into less output time).
-        let targetOutputFrames = AVAudioFrameCount(Double(inputFramesToSchedule) / Double(pitchUnit.rate))
+        // Hard-cap the output as well, so rounding can never push us past the 30s ceiling.
+        let targetOutputFrames = AVAudioFrameCount(
+            min(Double(inputFramesToSchedule) / effectiveRate, maxRenderedDuration * sampleRate)
+        )
 
         guard let renderBuffer = AVAudioPCMBuffer(
             pcmFormat: engine.manualRenderingFormat,
@@ -108,15 +126,16 @@ struct AudioProcessor {
             AVLinearPCMIsBigEndianKey: false
         ]
 
-        let outputFile: AVAudioFile
+        var outputFileRef: AVAudioFile?
         do {
-            outputFile = try AVAudioFile(
+            outputFileRef = try AVAudioFile(
                 forWriting: outputURL,
                 settings: outputSettings,
                 commonFormat: .pcmFormatFloat32,
                 interleaved: false
             )
         } catch {
+            log.error("Could not open output file \(outputURL.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
             throw AudioProcessorError.renderSetupFailed
         }
 
@@ -133,7 +152,7 @@ struct AudioProcessor {
             switch status {
             case .success:
                 do {
-                    try outputFile.write(from: renderBuffer)
+                    try outputFileRef?.write(from: renderBuffer)
                 } catch {
                     throw AudioProcessorError.renderFailed
                 }
@@ -153,5 +172,25 @@ struct AudioProcessor {
 
         player.stop()
         engine.stop()
+
+        // AVAudioFile flushes on deinit; drop the reference before we stat the file so the
+        // size check below sees the finished result rather than a partially-written one.
+        outputFileRef = nil
+
+        let bytes = (try? FileManager.default.attributesOfItem(atPath: outputURL.path))
+            .flatMap { $0[.size] as? Int } ?? 0
+        let renderedSeconds = Double(framesRendered) / sampleRate
+        log.info("Rendered \(outputURL.lastPathComponent, privacy: .public): \(renderedSeconds, format: .fixed(precision: 2))s, \(bytes) bytes.")
+
+        guard bytes > 0, framesRendered > 0 else {
+            log.error("Render produced an empty file for \(inputURL.lastPathComponent, privacy: .public).")
+            throw AudioProcessorError.renderFailed
+        }
+        guard renderedSeconds <= 30.0 else {
+            // Should be impossible given the caps above, but a sound over 30s is silently
+            // dropped by iOS, so fail loudly rather than scheduling a dud.
+            log.error("Rendered sound is \(renderedSeconds, format: .fixed(precision: 2))s — over the 30s notification limit.")
+            throw AudioProcessorError.renderFailed
+        }
     }
 }

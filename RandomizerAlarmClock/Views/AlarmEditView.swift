@@ -18,6 +18,7 @@ struct AlarmEditView: View {
     let isNew: Bool
 
     @State private var timeSelection: Date
+    @State private var didScheduleTest = false
 
     init(alarm: Alarm, isNew: Bool = false) {
         self.alarm = alarm
@@ -68,6 +69,20 @@ struct AlarmEditView: View {
             Section {
                 Toggle("Enabled", isOn: $alarm.isEnabled)
             }
+
+            Section {
+                Button {
+                    AlarmScheduler.scheduleTestFiring(for: alarm, inSeconds: 15)
+                    didScheduleTest = true
+                } label: {
+                    Label("Test fire in 15 seconds", systemImage: "bell.badge")
+                }
+                .disabled(alarm.soundPool.isEmpty)
+            } footer: {
+                Text(didScheduleTest
+                     ? "Test scheduled. Background the app or lock the phone to see it as a banner."
+                     : "Schedules a one-off notification using this alarm's sound pool, so you can confirm delivery without waiting for the alarm time.")
+            }
         }
         .navigationTitle(isNew ? "New Alarm" : "Edit Alarm")
         .navigationBarTitleDisplayMode(.inline)
@@ -90,9 +105,22 @@ struct AlarmEditView: View {
         if isNew {
             modelContext.insert(alarm)
         }
-        try? modelContext.save()
+
+        AlarmScheduler.log.info("Saving alarm \(alarm.id.uuidString, privacy: .public): \(alarm.soundPool.count) sound(s) in pool, enabled=\(alarm.isEnabled), repeatDays=\(String(describing: alarm.repeatDays), privacy: .public)")
+
+        do {
+            try modelContext.save()
+        } catch {
+            AlarmScheduler.log.error("Saving alarm before scheduling failed: \(error.localizedDescription, privacy: .public)")
+        }
+
         AlarmScheduler.reschedule(alarm)
-        try? modelContext.save()
+
+        do {
+            try modelContext.save()
+        } catch {
+            AlarmScheduler.log.error("Saving alarm after scheduling failed: \(error.localizedDescription, privacy: .public)")
+        }
         dismiss()
     }
 

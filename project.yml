@@ -14,7 +14,33 @@ targets:
         excludes:
           - "Resources/Info.plist"
     info:
+      # NOTE: XcodeGen *generates* this file on every `xcodegen generate`, overwriting
+      # whatever is on disk. Any Info.plist key the app needs must therefore be declared
+      # here under `properties`, not hand-edited into Resources/Info.plist.
       path: RandomizerAlarmClock/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Randomizer Alarm
+
+        # BUG 1 FIX.
+        # With no launch-screen declaration, iOS runs the app in legacy compatibility
+        # mode: it renders into a small legacy screen rect (~320x480) and scales the
+        # result up, which is exactly the "UI only fills the middle third of the
+        # screen" symptom. An empty UILaunchScreen dict is the documented way to ask
+        # for the plain, default, full-size launch screen.
+        UILaunchScreen: {}
+
+        # SwiftUI's App protocol supplies the scene itself, so no UISceneConfigurations
+        # entry is needed — but the manifest should be present and must not restrict size.
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UIApplicationSupportsIndirectInputEvents: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.personal.RandomizerAlarmClock
