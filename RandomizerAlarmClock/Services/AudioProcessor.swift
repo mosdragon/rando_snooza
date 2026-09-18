@@ -3,8 +3,8 @@
 //  RandomizerAlarmClock
 //
 //  Renders a source audio file with a randomized pitch shift and playback speed
-//  applied, trimmed to iOS's 30-second notification-sound limit, and writes the
-//  result to a .caf file that UNNotificationSound can play.
+//  applied, trimmed to iOS's 30-second alert-sound limit, and writes the result to a
+//  .caf file that AlarmKit's AlertConfiguration.AlertSound.named(_:) can play.
 //
 
 import Foundation
@@ -29,7 +29,7 @@ struct AudioProcessor {
 
     static let log = Logger(subsystem: "com.personal.RandomizerAlarmClock", category: "audio")
 
-    /// iOS requires notification sounds to be at most 30 seconds; stay comfortably under that.
+    /// iOS requires alert sounds to be at most 30 seconds; stay comfortably under that.
     /// This is a limit on the *rendered output*, not on the source material.
     static let maxRenderedDuration: Double = 28.0
 
@@ -74,7 +74,7 @@ struct AudioProcessor {
 
         // BUG FIX: this used to trim the *input* to maxRenderedDuration of source frames,
         // ignoring the rate. At the default speedMin of 0.85x, 28s of source stretches to
-        // 28 / 0.85 = ~32.9s of output — over iOS's hard 30-second notification-sound
+        // 28 / 0.85 = ~32.9s of output — over iOS's hard 30-second alert-sound
         // limit, at which point iOS discards the custom sound and plays the default one
         // (or nothing, depending on settings). Budget the trim in *output* time instead:
         // outputDuration = inputDuration / rate, so inputDuration = maxRenderedDuration * rate.
@@ -189,7 +189,7 @@ struct AudioProcessor {
         guard renderedSeconds <= 30.0 else {
             // Should be impossible given the caps above, but a sound over 30s is silently
             // dropped by iOS, so fail loudly rather than scheduling a dud.
-            log.error("Rendered sound is \(renderedSeconds, format: .fixed(precision: 2))s — over the 30s notification limit.")
+            log.error("Rendered sound is \(renderedSeconds, format: .fixed(precision: 2))s — over the 30s alert-sound limit.")
             throw AudioProcessorError.renderFailed
         }
     }

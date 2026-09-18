@@ -13,8 +13,8 @@
 		23878E0F1A9A2081476CE2F5 /* AudioProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */; };
 		3B9DF3E20B0F4D9B09DF0ED0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90D88415C402AAD1D16777C3 /* Extensions.swift */; };
 		3D56BB5C657ACE4BEEF8F78A /* viva.caf in Resources */ = {isa = PBXBuildFile; fileRef = A907BA6D1EBF63BD6BB28914 /* viva.caf */; };
+		47B94E5A9B4FFEF37F88B66F /* BundledAlarmSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F7E8921A7078B8B19DA239D /* BundledAlarmSound.swift */; };
 		69228D4D6A00F6B906F58309 /* AlarmScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */; };
-		75EC1FCAA9A1C435B846532D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */; };
 		79A45A0F74355676736195B5 /* AlarmEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D63279D316D82BA5510614 /* AlarmEditView.swift */; };
 		A070A5BAF40506E6365430C9 /* ccr_get_low.caf in Resources */ = {isa = PBXBuildFile; fileRef = 6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */; };
 		A58607F7DC6B733AFFCB3992 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */; };
@@ -26,15 +26,16 @@
 		E631354A819A5AD69569B88A /* RandomizerAlarmClockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */; };
 		F441C21EC22BC54A8486074E /* AlarmListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6440466ACC0F2B398BC06B /* AlarmListView.swift */; };
 		F72F38888C2CDE2F0EC0F081 /* RepeatDayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */; };
+		FAC5184E53B633FFFB1C9110 /* sounds.json in Resources */ = {isa = PBXBuildFile; fileRef = 446DDB7834D6E710173A5839 /* sounds.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessor.swift; sourceTree = "<group>"; };
 		0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmScheduler.swift; sourceTree = "<group>"; };
 		1895206D235B759C6C3F5489 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
-		1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		31D63279D316D82BA5510614 /* AlarmEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmEditView.swift; sourceTree = "<group>"; };
 		35320EF1A43791892A1A9FC0 /* AlarmKitScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmKitScheduler.swift; sourceTree = "<group>"; };
+		446DDB7834D6E710173A5839 /* sounds.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = sounds.json; sourceTree = "<group>"; };
 		485ABCBF76AAE33AC314E38C /* RandomizationRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizationRangeView.swift; sourceTree = "<group>"; };
 		4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatDayPicker.swift; sourceTree = "<group>"; };
 		5C57498F95D078E486D86251 /* Alarm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alarm.swift; sourceTree = "<group>"; };
@@ -42,6 +43,7 @@
 		6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccr_get_low.caf; sourceTree = "<group>"; };
 		7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizerAlarmClockApp.swift; sourceTree = "<group>"; };
 		71E63471558531D981667ADB /* AudioLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryManager.swift; sourceTree = "<group>"; };
+		7F7E8921A7078B8B19DA239D /* BundledAlarmSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledAlarmSound.swift; sourceTree = "<group>"; };
 		90D88415C402AAD1D16777C3 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
 		A907BA6D1EBF63BD6BB28914 /* viva.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = viva.caf; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 			isa = PBXGroup;
 			children = (
 				6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */,
+				446DDB7834D6E710173A5839 /* sounds.json */,
 				A907BA6D1EBF63BD6BB28914 /* viva.caf */,
 			);
 			path = Sounds;
@@ -64,7 +67,6 @@
 		3CF389114F77D5524DA35684 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */,
 				7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */,
 			);
 			path = App;
@@ -93,6 +95,7 @@
 				0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */,
 				71E63471558531D981667ADB /* AudioLibraryManager.swift */,
 				06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */,
+				7F7E8921A7078B8B19DA239D /* BundledAlarmSound.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A070A5BAF40506E6365430C9 /* ccr_get_low.caf in Resources */,
+				FAC5184E53B633FFFB1C9110 /* sounds.json in Resources */,
 				3D56BB5C657ACE4BEEF8F78A /* viva.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -234,11 +238,11 @@
 				1DC33C63DA4C2319B64EB992 /* AlarmKitScheduler.swift in Sources */,
 				F441C21EC22BC54A8486074E /* AlarmListView.swift in Sources */,
 				69228D4D6A00F6B906F58309 /* AlarmScheduler.swift in Sources */,
-				75EC1FCAA9A1C435B846532D /* AppDelegate.swift in Sources */,
 				AAB3DCFB407BB91136F1075A /* AudioFile.swift in Sources */,
 				225EC8CCFB9F31E29FB2000F /* AudioLibraryManager.swift in Sources */,
 				D81A1D54A1197DB0C03101DC /* AudioLibraryView.swift in Sources */,
 				23878E0F1A9A2081476CE2F5 /* AudioProcessor.swift in Sources */,
+				47B94E5A9B4FFEF37F88B66F /* BundledAlarmSound.swift in Sources */,
 				3B9DF3E20B0F4D9B09DF0ED0 /* Extensions.swift in Sources */,
 				E0F683C63B6D392920F6FA90 /* RandomizationRangeView.swift in Sources */,
 				E631354A819A5AD69569B88A /* RandomizerAlarmClockApp.swift in Sources */,

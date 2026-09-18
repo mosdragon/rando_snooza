@@ -1,7 +1,12 @@
 # Xcode Project Setup Guide
 
+> **The supported build path is XcodeGen — see `README.md`.** This document covers
+> creating the project by hand, which is only worth doing if you don't want to install
+> XcodeGen. Either way, read Step 5 for running on a device without a paid account.
+
 ## Prerequisites
-- macOS with Xcode 15 or later
+- macOS with **Xcode 26 or later** (the project targets iOS 26.1 and uses AlarmKit)
+- A device running **iOS 26.1 or later**
 - Apple ID (free — no paid developer account needed to run on your own device)
 
 ---
@@ -21,25 +26,29 @@
 
 ---
 
-## Step 2: Add Capabilities
+## Step 2: Capabilities
 
-In the project navigator, select the `RandomizerAlarmClock` target → **Signing & Capabilities**:
-
-1. Click **+ Capability**
-2. Add **Push Notifications**
-3. Add **Background Modes**, then check:
-   - `Audio, AirPlay, and Picture in Picture`
+**None needed.** AlarmKit requires no entitlement or capability — just the usage
+description in Step 3. (Earlier versions of this guide asked for Push Notifications and
+the Audio background mode; both were for the local-notification engine, which has been
+removed.)
 
 ---
 
 ## Step 3: Configure Info.plist
 
-Add this key (Xcode may auto-generate it; if not, add manually):
+Add this key. **AlarmKit cannot schedule anything without it** — if it's missing or
+empty, alarms silently never fire:
 
 ```
-NSUserNotificationUsageDescription
-→ "RandomizerAlarmClock uses notifications to deliver your alarms."
+NSAlarmKitUsageDescription
+→ "Randomizer Alarm schedules alarms so it can wake you with a randomized version
+   of a song you choose."
 ```
+
+Also add `UILaunchScreen` as an empty dictionary. Without a launch-screen declaration iOS
+runs the app in legacy compatibility mode and the UI renders into a small letterboxed
+area — see `BUGS_V0.md`. (With XcodeGen both keys come from `project.yml`.)
 
 ---
 

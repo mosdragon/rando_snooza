@@ -2,15 +2,14 @@
 //  AlarmKitScheduler.swift
 //  RandomizerAlarmClock
 //
-//  AlarmKit path (iOS 26+). Unlike a local notification, an AlarmKit alarm presents a
-//  full-screen alert with a system Stop button and "overrides both a device's focus and
-//  silent mode" — which is what this app actually wants.
+//  The AlarmKit wrapper — the app's only scheduling engine. An AlarmKit alarm presents a
+//  full-screen alert with a system Stop button and, in Apple's words, "overrides both a
+//  device's focus and silent mode, if necessary".
 //
 //  NOTE ON NAMING: AlarmKit declares its own `Alarm` type, which collides with this
 //  project's `@Model final class Alarm`. Every AlarmKit reference in this file is written
 //  as `AlarmKit.Alarm...`, and nothing here takes the app's `Alarm` model as a parameter —
-//  callers pass plain values instead. That keeps the collision contained to this one file
-//  until/unless the model is renamed.
+//  callers pass plain values instead. AlarmScheduler.swift is the model-facing façade.
 //
 
 import Foundation
@@ -19,163 +18,6 @@ import os
 
 import AlarmKit
 import ActivityKit   // AlertConfiguration.AlertSound lives here, not in AlarmKit
-
-// MARK: - Bundled sounds
-
-/// Sounds compiled into the app bundle. Both were trimmed to 29.5 s and converted to
-/// 16-bit linear PCM in a CAF container: iOS alert sounds must be at most 30 seconds and
-/// must be Linear PCM / MA4 / µ-law / a-law inside .caf, .aiff or .wav. The original
-/// .m4a/.mp3 files are AAC and are *not* a valid alert-sound format.
-enum BundledAlarmSound: String, CaseIterable, Identifiable {
-    case viva = "viva.caf"
-    case ccrGetLow = "ccr_get_low.caf"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .viva: return "Viva La Derivada"
-        case .ccrGetLow: return "CCR — Get Low"
-        }
-    }
-
-    /// Whether the file actually made it into the built bundle. Worth checking explicitly:
-    /// a resource that XcodeGen didn't pick up fails silently at play time.
-    var existsInBundle: Bool { bundleURL != nil }
-
-    var bundleURL: URL? {
-        let stem = (rawValue as NSString).deletingPathExtension
-        let ext = (rawValue as NSString).pathExtension
-        return Bundle.main.url(forResource: stem, withExtension: ext)
-    }
-}
-
-// MARK: - Engine / sound-source selection
-
-/// Which mechanism schedules alarms. Stored in `@AppStorage`, deliberately not on the
-/// `Alarm` model — adding a stored property to a `@Model` is a schema change and this
-/// project has no migration plan yet.
-enum AlarmEngine: String, CaseIterable, Identifiable {
-    case notifications
-    case alarmKit
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .notifications: return "Notifications"
-        case .alarmKit: return "AlarmKit"
-        }
-    }
-}
-
-/// Where an AlarmKit alarm's sound comes from. The whole point of the first test is to
-/// find out which of these actually plays.
-enum AlarmKitSoundSource: String, CaseIterable, Identifiable {
-    /// A fixed file compiled into the app bundle. No pitch/speed randomization, but it is
-    /// the path least likely to hit a platform bug.
-    case bundled
-    /// A file rendered at schedule time into `Library/Sounds/`, with randomized pitch and
-    /// speed — the actual feature. `AlertConfiguration.AlertSound.named(_:)` is documented
-    /// to read from both the main bundle and `Library/Sounds`, but custom sounds were
-    /// broken in iOS 26.0 and fixed in 26.1, so this needs verifying on device.
-    case randomizedRender
-    /// The system alarm sound. Control case — if this rings and the others don't, the
-    /// problem is the sound file, not AlarmKit.
-    case systemDefault
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .bundled: return "Bundled song"
-        case .randomizedRender: return "Randomized render"
-        case .systemDefault: return "System default"
-        }
-    }
-}
-
-// MARK: - Router
-
-/// Single place that decides which engine schedules an alarm, so the list view, the editor
-/// and anything added later can't drift apart. Reads the same `@AppStorage` keys the editor
-/// writes.
-enum AlarmRouter {
-
-    static let engineKey = "alarmEngine"
-    static let soundSourceKey = "alarmKitSoundSource"
-
-    static var engine: AlarmEngine {
-        AlarmEngine(rawValue: UserDefaults.standard.string(forKey: engineKey) ?? "") ?? .notifications
-    }
-
-    static var soundSource: AlarmKitSoundSource {
-        AlarmKitSoundSource(rawValue: UserDefaults.standard.string(forKey: soundSourceKey) ?? "") ?? .bundled
-    }
-
-    static var isUsingAlarmKit: Bool { engine == .alarmKit }
-
-    /// Resolves the file name to hand `AlertConfiguration.AlertSound.named(_:)`.
-    /// Returns nil to mean "use the system default alarm sound".
-    static func alarmKitSoundName(for alarm: Alarm) -> String? {
-        switch soundSource {
-        case .systemDefault:
-            return nil
-        case .bundled:
-            guard let pick = BundledAlarmSound.allCases.filter(\.existsInBundle).randomElement() else {
-                AlarmScheduler.log.error("No bundled sounds found in the app bundle; using the system default sound.")
-                return nil
-            }
-            return pick.rawValue
-        case .randomizedRender:
-            return AlarmScheduler.renderRandomizedSound(for: alarm, namePrefix: "alarmkit")
-        }
-    }
-
-    /// Schedules `alarm` with whichever engine is selected, cancelling the other engine's
-    /// copy first so an alarm can never be held by both at once.
-    static func reschedule(_ alarm: Alarm) {
-        guard engine == .alarmKit else {
-            // Notifications selected: drop any AlarmKit alarm left over from a previous
-            // save, or it keeps firing alongside the notifications.
-            AlarmKitScheduler.cancel(id: alarm.id)
-            AlarmScheduler.reschedule(alarm)
-            return
-        }
-
-        AlarmScheduler.cancelPending(for: alarm)
-
-        let soundName = alarmKitSoundName(for: alarm)
-        let id = alarm.id
-        let label = alarm.label
-        let hour = alarm.hour
-        let minute = alarm.minute
-        let weekdays = alarm.repeatDays
-        let isEnabled = alarm.isEnabled
-
-        Task {
-            if isEnabled {
-                _ = await AlarmKitScheduler.schedule(
-                    id: id,
-                    label: label,
-                    hour: hour,
-                    minute: minute,
-                    weekdays: weekdays,
-                    soundName: soundName
-                )
-            } else {
-                AlarmKitScheduler.cancel(id: id)
-            }
-        }
-    }
-
-    /// Cancels this alarm on both engines. Used on delete, where the engine setting at the
-    /// time of scheduling may not match the one selected now.
-    static func cancel(_ alarm: Alarm) {
-        AlarmScheduler.cancelPending(for: alarm)
-        AlarmKitScheduler.cancel(id: alarm.id)
-    }
-}
 
 // MARK: - Scheduler
 
@@ -229,7 +71,7 @@ enum AlarmKitScheduler {
     /// Schedules (or replaces) the AlarmKit alarm for one app alarm.
     ///
     /// One AlarmKit alarm covers the whole repeating schedule — AlarmKit handles recurrence
-    /// itself, so there's no need for the notification path's 7 pre-rendered occurrences.
+    /// itself, so there's no need to pre-schedule a batch of individual occurrences.
     /// The trade-off: a repeating AlarmKit alarm has ONE sound, so the sound is randomized
     /// per *schedule*, not per firing. See ALARMKIT_V1.md.
     ///
@@ -379,6 +221,20 @@ enum AlarmKitScheduler {
             }
         } catch {
             log.error("Could not read AlarmKit's scheduled alarms: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Streams AlarmKit's own view of what is scheduled. AlarmKit *removes* an alarm from
+    /// its store once it has fired and stopped, so an alarm dropping out of this stream is
+    /// the documented signal that it went off — which is the hook for re-randomizing a
+    /// repeating alarm's sound per firing (see ALARMKIT_V1.md).
+    static func observeAlarmUpdates() async {
+        log.info("Observing AlarmKit alarm updates.")
+        for await scheduled in AlarmManager.shared.alarmUpdates {
+            log.info("alarmUpdates: \(scheduled.count) alarm(s) currently scheduled.")
+            for item in scheduled {
+                log.info("  • \(String(describing: item), privacy: .public)")
+            }
         }
     }
 

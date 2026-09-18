@@ -1,5 +1,10 @@
 # Known Bugs — v0 (Simulator testing)
 
+> **Historical.** Both bugs below were fixed and verified. Bug 2's engine — local
+> notifications — has since been removed from the app entirely in favour of AlarmKit,
+> because even once scheduling worked, a notification could not take over the screen and
+> was silenced by Focus. See `ALARMKIT_V1.md`. Kept for the record.
+
 **Status: both v0 bugs have had fixes applied in code. Neither has been verified on a
 build yet** — the fixes below were written without a Mac toolchain available, so the
 next session's first job is `xcodegen generate` + build + run, then walk the

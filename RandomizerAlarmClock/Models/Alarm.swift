@@ -25,10 +25,6 @@ final class Alarm {
     var speedMin: Float
     var speedMax: Float
 
-    /// Identifiers of the currently-scheduled UNNotificationRequests for this alarm,
-    /// so they can be cancelled/replaced on edit, disable, or delete.
-    var pendingNotificationIDs: [String]
-
     var dateCreated: Date
 
     /// Files eligible to be picked when this alarm fires. SwiftData relationship;
@@ -47,7 +43,6 @@ final class Alarm {
         self.pitchMaxCents = 200
         self.speedMin = 0.85
         self.speedMax = 1.15
-        self.pendingNotificationIDs = []
         self.dateCreated = Date()
         self.soundPool = []
     }

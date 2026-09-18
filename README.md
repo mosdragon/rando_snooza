@@ -1,16 +1,19 @@
 # Randomizer Alarm Clock
 
-Native iOS alarm app (SwiftUI + SwiftData). Each alarm draws a random sound from a
-user-curated pool, applies a randomized pitch shift and playback speed, then fires.
-See `PLAN.md` and `PLAN_TECHNICAL.md` for the full design; this README just covers
-building what's in `RandomizerAlarmClock/`.
+Native iOS alarm app (SwiftUI + SwiftData + **AlarmKit**). Each alarm draws a random
+sound from a pool, optionally applies a randomized pitch shift and playback speed, and
+fires as a full-screen alarm that overrides Focus and silent mode.
+
+**Requires iOS 26.1+.** See `ALARMKIT_V1.md` for the architecture and open questions,
+`BUGS_V0.md` for the history of the v0 bugs, and `PLAN.md` / `PLAN_TECHNICAL.md` for the
+original design (parts of which the AlarmKit move superseded).
 
 ## Build (recommended: XcodeGen)
 
 The whole Xcode project is generated from `project.yml` so nothing needs to be
 clicked together by hand in Xcode.
 
-1. Install XcodeGen (one-time): `brew install xcodegen`
+1. Install XcodeGen (one-time): `brew install xcodegen`. You also need Xcode 26+.
 2. From this folder, run:
    ```
    xcodegen generate
@@ -20,7 +23,7 @@ clicked together by hand in Xcode.
 4. Select your Apple ID under **Signing & Capabilities → Team** (a free personal
    team works — see `SETUP.md` for the no-paid-account run instructions).
 5. Plug in your iPhone, select it as the run destination, and hit **Run** (⌘R).
-6. First launch will ask for notification permission — allow it, or alarms won't fire.
+6. First launch asks for alarm permission (AlarmKit) — allow it, or alarms won't fire.
 
 Re-run `xcodegen generate` any time `project.yml` changes; it's safe to run repeatedly
 and won't touch your source files.
@@ -34,30 +37,69 @@ sure "Copy items if needed" is **unchecked** (the files already live in the righ
 place) and the app target's membership is checked for each file. Use the
 `Resources/Info.plist` included here as the target's Info.plist.
 
-## What's implemented (MVP, per PLAN.md)
+## Adding alarm sounds
+
+Alarm sounds are `.caf` files compiled into the app bundle, discovered at runtime — there
+is no list of them in code, so adding one needs no Swift changes.
+
+```bash
+# first 29.5 s of a song
+tools/make_alarm_sound.py ~/Music/wake_up.mp3
+
+# a specific section, with a display name
+tools/make_alarm_sound.py song.m4a --start 1:12 --title "Wake Up (chorus)"
+
+# audio out of a video, then regenerate the project
+tools/make_alarm_sound.py clip.mov --start 0:05 --duration 20 --xcodegen
+
+tools/make_alarm_sound.py --list            # what's bundled, and what it costs
+tools/make_alarm_sound.py --remove wake_up  # drop one
+```
+
+The script takes anything ffmpeg can read (mp3, m4a, wav, flac, mp4, mov, …), trims it,
+peak-normalizes it, converts it to 16-bit linear PCM CAF, writes it into
+`RandomizerAlarmClock/Resources/Sounds/`, and records a display title in `sounds.json`.
+It needs `ffmpeg`/`ffprobe` (`brew install ffmpeg` or `conda install -c conda-forge ffmpeg`).
+
+**Re-run `xcodegen generate` after adding or removing sounds** — new files aren't in the
+build until the project is regenerated. If the app shows "No sounds in the app bundle",
+that's the step that was missed.
+
+Two conversions are non-negotiable, both platform limits: alert sounds must be **at most
+30 seconds**, and they must be **Linear PCM / MA4 / µ-law / a-law** in `.caf`, `.aiff` or
+`.wav`. AAC (`.m4a`, `.mp4`) and MP3 are not valid alert sounds — renaming a song does not
+work, it just plays a system error tone.
+
+## What's implemented
 
 - Create / edit / delete alarms; enable/disable toggle; label; repeat days or one-shot
-- Per-alarm sound pool selected from an imported audio library
-- Randomized pitch (±300 cents) and speed (0.75x–1.25x) ranges per alarm, re-rolled
-  every time the alarm fires
+- Full-screen AlarmKit alert with a system Stop button, which overrides Focus and silent
+  mode — one AlarmKit alarm covers an entire weekly recurrence
+- Three sound sources per the editor's picker: a random **bundled song**, a
+  **randomized render** (random pitch/speed written to `Library/Sounds` at save time), or
+  the **system default** alarm sound
+- Per-alarm sound pool selected from an imported audio library, plus per-alarm randomized
+  pitch and speed ranges
 - Audio import (MP3/M4A/WAV) via the Files picker (iCloud Drive, Google Drive, On My
   iPhone), preview playback, rename, delete
-- Local notifications carrying a pre-rendered `.caf` sound, so alarms fire correctly
-  even when the app is closed or terminated (see "How alarm delivery works" in
-  `PLAN.md` for why this approach is necessary on iOS)
-- Alarms pre-render and schedule their next 7 occurrences at once, so a repeating
-  alarm keeps firing even if you don't reopen the app in between
+- "Test fire in 20 seconds" in the alarm editor, for checking delivery without waiting
 
-Not implemented (left as Post-MVP per PLAN.md): snooze, volume fade-in, random start
-offset within a file, iCloud sync, direct Google Drive OAuth, widget, Siri/Shortcuts.
+Not implemented: snooze (needs a countdown presentation, which pulls in a widget
+extension), volume fade-in, random start offset within a file, iCloud sync, direct Google
+Drive OAuth, widget, Siri/Shortcuts.
 
 ## Known limitations worth knowing about
 
-- iOS caps custom notification sounds at 30 seconds; only the first ~28s of a source
-  file (after speed change) is ever heard.
-- iOS allows at most 64 pending notification requests app-wide. With the default of
-  7 pre-scheduled occurrences per repeating alarm, that's roughly 9 repeating alarms
-  before you'd hit the ceiling — plenty for personal use, but worth knowing if you
-  add many alarms.
-- If the app isn't opened for a long time, a repeating alarm's pre-scheduled batch
-  can run out; opening the app (or the alarm firing once) tops it back up.
+- **iOS 26.1 is the floor.** `AlarmPresentation.Alert`'s non-deprecated initializer is
+  26.1+, and that sets the deployment target.
+- **Alert sounds are capped at 30 seconds**, so only the first ~28 s of a randomized
+  render (after the speed change) is ever heard.
+- **A repeating alarm has one sound.** AlarmKit handles recurrence itself and each alarm
+  carries a single sound, so the sound is randomized per *save*, not per firing. See
+  "Open design questions" in `ALARMKIT_V1.md`.
+- **Bundled sounds are uncompressed** — roughly 5 MB per 30 s stereo song (use `--mono`
+  to halve that). `--list` prints the running total.
+- **No SwiftData migration plan.** Any new stored property on `Alarm` or `AudioFile` risks
+  a store that won't open; during development the fix is deleting the app.
+- **No app icon** — `ASSETCATALOG_COMPILER_APPICON_NAME` is set but there's no
+  `Assets.xcassets`, so the build warns.

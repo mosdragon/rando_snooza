@@ -9,13 +9,11 @@ import os
 
 @main
 struct RandomizerAlarmClockApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     private static let log = Logger(subsystem: "com.personal.RandomizerAlarmClock", category: "app")
 
-    /// Static so `AppDelegate` can reach the SwiftData context the moment a notification
-    /// arrives — including a cold launch from tapping one, where the delegate callback can
-    /// run before any SwiftUI view's `onAppear`.
+    /// Static so anything outside the view tree can reach the SwiftData context without
+    /// waiting for a view's `onAppear`.
     static let sharedModelContainer: ModelContainer = {
         do {
             return try ModelContainer(for: Alarm.self, AudioFile.self)
@@ -25,17 +23,18 @@ struct RandomizerAlarmClockApp: App {
         }
     }()
 
-    init() {
-        // Ask for permission as early as possible so the first alarm a user saves is
-        // scheduled against an already-granted authorization rather than racing it.
-        AlarmScheduler.requestAuthorizationIfNeeded()
-    }
-
     var body: some Scene {
         WindowGroup {
             RootTabView()
-                .onAppear {
-                    AlarmScheduler.logPendingSummary()
+                .task {
+                    // Ask up front so the first alarm a user saves isn't racing the prompt.
+                    await AlarmKitScheduler.requestAuthorization()
+                    AlarmKitScheduler.logScheduledSummary()
+                    Self.log.info("Bundled alarm sounds available: \(BundledAlarmSound.all.count)")
+                }
+                .task {
+                    // Long-lived: runs for as long as this scene is alive.
+                    await AlarmKitScheduler.observeAlarmUpdates()
                 }
         }
         .modelContainer(Self.sharedModelContainer)
