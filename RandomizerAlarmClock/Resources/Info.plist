@@ -25,6 +25,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSAlarmKitUsageDescription</key>
+	<string>Randomizer Alarm schedules alarms so it can wake you with a randomized version of a song you choose.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

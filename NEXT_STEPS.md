@@ -59,13 +59,15 @@ option here:
 
 ## 3. The real fix: migrate to AlarmKit (iOS 26+)
 
-AlarmKit is Apple's framework for alarms and timers, added in iOS 26. It gives what this
+AlarmKit is Apple's framework for alarms and timers, added in iOS 26. **Status: done — see
+`ALARMKIT_V1.md`.** The notes below are the original plan; the deployment floor turned out to
+be 26.1 rather than 26.0, and no widget extension was needed for an alert-only alarm. It gives what this
 app actually wants: a **full-screen alert UI with Stop/Snooze buttons that breaks
 through both the silent switch and Focus**, without a special entitlement.
 
 ### What the migration involves
 
-1. **Raise the deployment target** from `17.0` to `26.0` in `project.yml`
+1. **Raise the deployment target** from `17.0` to `26.1` in `project.yml`
    (`deploymentTarget` in both `options` and the target, plus `IPHONEOS_DEPLOYMENT_TARGET`).
    This drops every device that can't run iOS 26 — the main cost of this path.
 2. **Add `NSAlarmKitUsageDescription`** to `info.properties` in `project.yml`

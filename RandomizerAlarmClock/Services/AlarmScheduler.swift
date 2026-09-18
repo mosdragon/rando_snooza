@@ -295,6 +295,48 @@ enum AlarmScheduler {
         }
     }
 
+    // MARK: - Randomized render for the AlarmKit path
+
+    /// Renders one randomized sound into `Library/Sounds/` and returns its **file name**
+    /// (which is what `AlertConfiguration.AlertSound.named(_:)` wants), or nil if the render
+    /// failed. Used by the AlarmKit path, where a single alarm carries a single sound.
+    ///
+    /// Falls back to a bundled song as the render *source* when the alarm's pool is empty,
+    /// so the AlarmKit test works without importing anything first.
+    static func renderRandomizedSound(for alarm: Alarm, namePrefix: String) -> String? {
+        let sourceURL: URL
+        if let poolFile = alarm.soundPool.randomElement() {
+            sourceURL = poolFile.fileURL
+        } else if let bundled = BundledAlarmSound.allCases.filter({ $0.existsInBundle }).randomElement(),
+                  let bundledURL = bundled.bundleURL {
+            log.info("Alarm \(alarm.id.uuidString, privacy: .public) has an empty pool; rendering from bundled \(bundled.rawValue, privacy: .public).")
+            sourceURL = bundledURL
+        } else {
+            log.error("No render source available: pool is empty and no bundled sound is present in the app bundle.")
+            return nil
+        }
+
+        let (pitch, rate) = AudioProcessor.randomizedParameters(for: alarm)
+        let fileName = "\(namePrefix)_\(alarm.id.uuidString).caf"
+        let outputURL = soundsDirectory.appendingPathComponent(fileName)
+        try? FileManager.default.removeItem(at: outputURL)
+
+        do {
+            try AudioProcessor.renderSound(
+                inputURL: sourceURL,
+                pitchCents: pitch,
+                rate: rate,
+                outputURL: outputURL
+            )
+        } catch {
+            log.error("Randomized render failed: \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
+
+        log.info("Randomized render ready at Library/Sounds/\(fileName, privacy: .public) from \(sourceURL.lastPathComponent, privacy: .public).")
+        return fileName
+    }
+
     // MARK: - Authorization
 
     /// Requests notification permission; call once at launch.

@@ -19,6 +19,13 @@ struct AlarmEditView: View {
 
     @State private var timeSelection: Date
     @State private var didScheduleTest = false
+    @State private var alarmKitStatus: String?
+
+    @AppStorage("alarmEngine") private var engineRaw = AlarmEngine.notifications.rawValue
+    @AppStorage("alarmKitSoundSource") private var soundSourceRaw = AlarmKitSoundSource.bundled.rawValue
+
+    private var engine: AlarmEngine { AlarmEngine(rawValue: engineRaw) ?? .notifications }
+    private var soundSource: AlarmKitSoundSource { AlarmKitSoundSource(rawValue: soundSourceRaw) ?? .bundled }
 
     init(alarm: Alarm, isNew: Bool = false) {
         self.alarm = alarm
@@ -70,19 +77,7 @@ struct AlarmEditView: View {
                 Toggle("Enabled", isOn: $alarm.isEnabled)
             }
 
-            Section {
-                Button {
-                    AlarmScheduler.scheduleTestFiring(for: alarm, inSeconds: 15)
-                    didScheduleTest = true
-                } label: {
-                    Label("Test fire in 15 seconds", systemImage: "bell.badge")
-                }
-                .disabled(alarm.soundPool.isEmpty)
-            } footer: {
-                Text(didScheduleTest
-                     ? "Test scheduled. Background the app or lock the phone to see it as a banner."
-                     : "Schedules a one-off notification using this alarm's sound pool, so you can confirm delivery without waiting for the alarm time.")
-            }
+            engineSection
         }
         .navigationTitle(isNew ? "New Alarm" : "Edit Alarm")
         .navigationBarTitleDisplayMode(.inline)
@@ -93,6 +88,91 @@ struct AlarmEditView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Save") { save() }
                     .fontWeight(.semibold)
+            }
+        }
+    }
+
+    // MARK: - Engine / test section
+
+    @ViewBuilder
+    private var engineSection: some View {
+        Section {
+            Picker("Engine", selection: $engineRaw) {
+                ForEach(AlarmEngine.allCases) { option in
+                    Text(option.displayName).tag(option.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            if engine == .alarmKit {
+                Picker("AlarmKit sound", selection: $soundSourceRaw) {
+                    ForEach(AlarmKitSoundSource.allCases) { option in
+                        Text(option.displayName).tag(option.rawValue)
+                    }
+                }
+
+                if soundSource == .bundled {
+                    ForEach(BundledAlarmSound.allCases) { sound in
+                        HStack {
+                            Text(sound.displayName)
+                                .font(.caption)
+                            Spacer()
+                            Image(systemName: sound.existsInBundle ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundStyle(sound.existsInBundle ? .green : .red)
+                        }
+                    }
+                }
+            }
+        } header: {
+            Text("Alarm engine")
+        } footer: {
+            if engine == .alarmKit {
+                Text("AlarmKit shows a full-screen alert and overrides Focus and silent mode. One alarm covers the whole repeat schedule, so the sound is randomized per save rather than per firing.")
+            } else {
+                Text("Notifications show a banner only, cap the sound at 30 seconds, and are suppressed by Focus / Do Not Disturb.")
+            }
+        }
+
+        Section {
+            Button {
+                testFire()
+            } label: {
+                Label("Test fire in 20 seconds", systemImage: "bell.badge")
+            }
+            .disabled(engine == .notifications && alarm.soundPool.isEmpty)
+        } footer: {
+            if let alarmKitStatus {
+                Text(alarmKitStatus)
+            } else if didScheduleTest {
+                Text("Test scheduled. Lock the phone or background the app to see how it presents.")
+            } else {
+                Text("Fires once, using the engine selected above, so delivery can be confirmed without waiting for the alarm time.")
+            }
+        }
+    }
+
+    private func testFire() {
+        alarmKitStatus = nil
+
+        guard engine == .alarmKit else {
+            AlarmScheduler.scheduleTestFiring(for: alarm, inSeconds: 20)
+            didScheduleTest = true
+            return
+        }
+
+        let soundName = AlarmRouter.alarmKitSoundName(for: alarm)
+        let label = alarm.label
+        Task {
+            let ok = await AlarmKitScheduler.scheduleTestFiring(
+                label: label,
+                inSeconds: 20,
+                soundName: soundName
+            )
+            await MainActor.run {
+                didScheduleTest = ok
+                alarmKitStatus = ok
+                    ? "AlarmKit test scheduled for 20 seconds from now (sound: \(soundName ?? "system default"))."
+                    : "AlarmKit refused the alarm — check the console for the error."
             }
         }
     }
@@ -114,7 +194,7 @@ struct AlarmEditView: View {
             AlarmScheduler.log.error("Saving alarm before scheduling failed: \(error.localizedDescription, privacy: .public)")
         }
 
-        AlarmScheduler.reschedule(alarm)
+        AlarmRouter.reschedule(alarm)
 
         do {
             try modelContext.save()

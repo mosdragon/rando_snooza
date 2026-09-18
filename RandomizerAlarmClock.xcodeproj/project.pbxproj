@@ -7,13 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1DC33C63DA4C2319B64EB992 /* AlarmKitScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35320EF1A43791892A1A9FC0 /* AlarmKitScheduler.swift */; };
 		1EFD938556F2519C091F486D /* SoundPoolPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5776D8D1B2B897A6AFC8B2A /* SoundPoolPickerView.swift */; };
 		225EC8CCFB9F31E29FB2000F /* AudioLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E63471558531D981667ADB /* AudioLibraryManager.swift */; };
 		23878E0F1A9A2081476CE2F5 /* AudioProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */; };
 		3B9DF3E20B0F4D9B09DF0ED0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90D88415C402AAD1D16777C3 /* Extensions.swift */; };
+		3D56BB5C657ACE4BEEF8F78A /* viva.caf in Resources */ = {isa = PBXBuildFile; fileRef = A907BA6D1EBF63BD6BB28914 /* viva.caf */; };
 		69228D4D6A00F6B906F58309 /* AlarmScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */; };
 		75EC1FCAA9A1C435B846532D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */; };
 		79A45A0F74355676736195B5 /* AlarmEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D63279D316D82BA5510614 /* AlarmEditView.swift */; };
+		A070A5BAF40506E6365430C9 /* ccr_get_low.caf in Resources */ = {isa = PBXBuildFile; fileRef = 6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */; };
 		A58607F7DC6B733AFFCB3992 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */; };
 		A692EEEB6565CE1C70762FEB /* Alarm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C57498F95D078E486D86251 /* Alarm.swift */; };
 		AAB3DCFB407BB91136F1075A /* AudioFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5515C7C6D2845B0F835821 /* AudioFile.swift */; };
@@ -31,14 +34,17 @@
 		1895206D235B759C6C3F5489 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		1EAC067C3CDE4D52C09256CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		31D63279D316D82BA5510614 /* AlarmEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmEditView.swift; sourceTree = "<group>"; };
+		35320EF1A43791892A1A9FC0 /* AlarmKitScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmKitScheduler.swift; sourceTree = "<group>"; };
 		485ABCBF76AAE33AC314E38C /* RandomizationRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizationRangeView.swift; sourceTree = "<group>"; };
 		4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatDayPicker.swift; sourceTree = "<group>"; };
 		5C57498F95D078E486D86251 /* Alarm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alarm.swift; sourceTree = "<group>"; };
 		657DB9EF8551BF6416EDA683 /* RandomizerAlarmClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RandomizerAlarmClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccr_get_low.caf; sourceTree = "<group>"; };
 		7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizerAlarmClockApp.swift; sourceTree = "<group>"; };
 		71E63471558531D981667ADB /* AudioLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryManager.swift; sourceTree = "<group>"; };
 		90D88415C402AAD1D16777C3 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
+		A907BA6D1EBF63BD6BB28914 /* viva.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = viva.caf; sourceTree = "<group>"; };
 		BA6440466ACC0F2B398BC06B /* AlarmListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmListView.swift; sourceTree = "<group>"; };
 		C5776D8D1B2B897A6AFC8B2A /* SoundPoolPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPoolPickerView.swift; sourceTree = "<group>"; };
 		DB5932E983DFC8BEB7098E98 /* AudioLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryView.swift; sourceTree = "<group>"; };
@@ -46,6 +52,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		33AC9C9EA8DF25402033A35C /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */,
+				A907BA6D1EBF63BD6BB28914 /* viva.caf */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 		3CF389114F77D5524DA35684 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -53,6 +68,14 @@
 				7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		4791A7F5A9E83737F0A64DD1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				33AC9C9EA8DF25402033A35C /* Sounds */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		5ABF25AA2ACEC47278EA655B /* Products */ = {
@@ -66,6 +89,7 @@
 		6646AC0C2683CE990B516708 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				35320EF1A43791892A1A9FC0 /* AlarmKitScheduler.swift */,
 				0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */,
 				71E63471558531D981667ADB /* AudioLibraryManager.swift */,
 				06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */,
@@ -98,6 +122,7 @@
 			children = (
 				3CF389114F77D5524DA35684 /* App */,
 				BAA5F2A639E516513B5D4C6F /* Models */,
+				4791A7F5A9E83737F0A64DD1 /* Resources */,
 				6646AC0C2683CE990B516708 /* Services */,
 				E26BD706BFD6D728FB84AF41 /* Utilities */,
 				CD8AB091517D573D85887A75 /* Views */,
@@ -141,6 +166,7 @@
 			buildConfigurationList = E706F0F868DF0E11BC148EE8 /* Build configuration list for PBXNativeTarget "RandomizerAlarmClock" */;
 			buildPhases = (
 				A51F28BDD3A30D1CB923832F /* Sources */,
+				11D86E8E15D144A7B3052BB3 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -186,6 +212,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		11D86E8E15D144A7B3052BB3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A070A5BAF40506E6365430C9 /* ccr_get_low.caf in Resources */,
+				3D56BB5C657ACE4BEEF8F78A /* viva.caf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A51F28BDD3A30D1CB923832F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -193,6 +231,7 @@
 			files = (
 				A692EEEB6565CE1C70762FEB /* Alarm.swift in Sources */,
 				79A45A0F74355676736195B5 /* AlarmEditView.swift in Sources */,
+				1DC33C63DA4C2319B64EB992 /* AlarmKitScheduler.swift in Sources */,
 				F441C21EC22BC54A8486074E /* AlarmListView.swift in Sources */,
 				69228D4D6A00F6B906F58309 /* AlarmScheduler.swift in Sources */,
 				75EC1FCAA9A1C435B846532D /* AppDelegate.swift in Sources */,
@@ -258,7 +297,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -278,7 +317,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				INFOPLIST_FILE = RandomizerAlarmClock/Resources/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -300,7 +339,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				INFOPLIST_FILE = RandomizerAlarmClock/Resources/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -364,7 +403,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

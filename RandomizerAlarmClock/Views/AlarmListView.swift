@@ -71,7 +71,7 @@ struct AlarmListView: View {
                 get: { alarm.isEnabled },
                 set: { newValue in
                     alarm.isEnabled = newValue
-                    AlarmScheduler.reschedule(alarm)
+                    AlarmRouter.reschedule(alarm)
                     try? modelContext.save()
                 }
             ))
@@ -82,7 +82,7 @@ struct AlarmListView: View {
     private func delete(at offsets: IndexSet) {
         for index in offsets where index < alarms.count {
             let alarm = alarms[index]
-            AlarmScheduler.cancelPending(for: alarm)
+            AlarmRouter.cancel(alarm)
             modelContext.delete(alarm)
         }
         do {
