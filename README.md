@@ -20,8 +20,11 @@ clicked together by hand in Xcode.
    ```
    This produces `RandomizerAlarmClock.xcodeproj`.
 3. Open `RandomizerAlarmClock.xcodeproj` in Xcode.
-4. Select your Apple ID under **Signing & Capabilities → Team** (a free personal
-   team works — see `SETUP.md` for the no-paid-account run instructions).
+4. Signing is already configured: `DEVELOPMENT_TEAM` is set in `project.yml`, so the team
+   survives every `xcodegen generate`. Do **not** set it in Xcode's Signing & Capabilities
+   editor — that writes only to the generated `project.pbxproj` and is wiped on the next
+   generate. To change teams, edit `project.yml`. (A free personal team works — see
+   `SETUP.md` for the no-paid-account run instructions.)
 5. Plug in your iPhone, select it as the run destination, and hit **Run** (⌘R).
 6. First launch asks for alarm permission (AlarmKit) — allow it, or alarms won't fire.
 
@@ -101,5 +104,6 @@ Drive OAuth, widget, Siri/Shortcuts.
   to halve that). `--list` prints the running total.
 - **No SwiftData migration plan.** Any new stored property on `Alarm` or `AudioFile` risks
   a store that won't open; during development the fix is deleting the app.
-- **No app icon** — `ASSETCATALOG_COMPILER_APPICON_NAME` is set but there's no
-  `Assets.xcassets`, so the build warns.
+- **The app icon is upscaled** from a 474×480 source, so it's soft at full size. Replace
+  `Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` with a render from a
+  ≥1024px original when there is one (RGB, no alpha).

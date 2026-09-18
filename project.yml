@@ -7,6 +7,17 @@ options:
     # requires an explicit stopButton and is deprecated.
     iOS: "26.1"
   createIntermediateGroups: true
+# Project-level build settings, inherited by every target.
+#
+# DEVELOPMENT_TEAM lives here because `xcodegen generate` rewrites project.pbxproj from
+# scratch. Anything picked in Xcode's Signing & Capabilities editor is stored only in that
+# generated file, so it is silently discarded on the next generate — which is why the team
+# selection kept disappearing. Declaring it here makes it survive.
+settings:
+  base:
+    DEVELOPMENT_TEAM: 94CJ2KL5G5
+    CODE_SIGN_STYLE: Automatic
+
 targets:
   RandomizerAlarmClock:
     type: application
@@ -26,6 +37,10 @@ targets:
 
         # Required by AlarmKit. If this key is missing or empty, the app cannot schedule
         # alarms with AlarmKit at all — no error, it just never alerts.
+        # Required for the snooze countdown presentation, which is an ActivityKit Live
+        # Activity rendered by the widget extension target below.
+        NSSupportsLiveActivities: true
+
         NSAlarmKitUsageDescription: >-
           Randomizer Alarm schedules alarms so it can wake you with a randomized version
           of a song you choose.
@@ -50,16 +65,51 @@ targets:
         UIRequiredDeviceCapabilities:
           - arm64
         UIApplicationSupportsIndirectInputEvents: true
+    dependencies:
+      # Declaring the extension as a dependency is what makes XcodeGen embed the .appex
+      # into the app. Without it the widget builds but never ships, and AlarmKit's
+      # countdown presentation has nothing to render.
+      - target: RandomizerAlarmClockWidget
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.personal.RandomizerAlarmClock
         PRODUCT_NAME: RandomizerAlarmClock
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1"
-        CODE_SIGN_STYLE: Automatic
         IPHONEOS_DEPLOYMENT_TARGET: "26.1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         DEVELOPMENT_ASSET_PATHS: ""
+  # Exists only to host the snooze countdown Live Activity. Apple: "AlarmKit expects a
+  # widget extension if an app supports a countdown presentation. Otherwise, the system may
+  # unexpectedly dismiss alarms and fail to alert."
+  RandomizerAlarmClockWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.1"
+    sources:
+      - path: RandomizerAlarmClockWidget
+        excludes:
+          - "Info.plist"
+      # Shared with the app target: the widget must compile the identical metadata type,
+      # since it receives the same AlarmAttributes<RandomizerAlarmMetadata> the app sends.
+      - path: RandomizerAlarmClock/Shared/RandomizerAlarmMetadata.swift
+    info:
+      path: RandomizerAlarmClockWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Randomizer Alarm
+        CFBundlePackageType: XPC!
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        # An app extension's bundle id must be prefixed by the host app's.
+        PRODUCT_BUNDLE_IDENTIFIER: com.personal.RandomizerAlarmClock.Widget
+        PRODUCT_NAME: RandomizerAlarmClockWidget
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "26.1"
+        SKIP_INSTALL: true
+
 schemes:
   RandomizerAlarmClock:
     build:

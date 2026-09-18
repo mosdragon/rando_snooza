@@ -21,10 +21,6 @@ import ActivityKit   // AlertConfiguration.AlertSound lives here, not in AlarmKi
 
 // MARK: - Scheduler
 
-struct RandomizerAlarmMetadata: AlarmMetadata {
-    init() {}
-}
-
 enum AlarmKitScheduler {
 
     static let log = Logger(subsystem: "com.personal.RandomizerAlarmClock", category: "alarmkit")
@@ -79,13 +75,16 @@ enum AlarmKitScheduler {
     ///   - id: use the app alarm's own `UUID`, so cancelling needs no extra bookkeeping.
     ///   - weekdays: 0 = Sunday … 6 = Saturday, matching `Alarm.repeatDays`. Empty = one-shot.
     ///   - soundName: file name for `.named(_:)`, or nil for the system default sound.
+    ///   - snoozeMinutes: nil disables snooze entirely (and with it the countdown
+    ///     presentation, so the widget extension is never exercised).
     static func schedule(
         id: UUID,
         label: String,
         hour: Int,
         minute: Int,
         weekdays: [Int],
-        soundName: String?
+        soundName: String?,
+        snoozeMinutes: Int?
     ) async -> Bool {
         guard await requestAuthorization() else {
             log.error("Not scheduling \(id.uuidString, privacy: .public): AlarmKit is not authorized.")
@@ -93,24 +92,7 @@ enum AlarmKitScheduler {
         }
 
         let title = label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Alarm" : label
-
-        // The stop button is supplied by the system. No secondary button: a "Repeat"/snooze
-        // button uses `.countdown` behavior, which needs a countdown presentation, and
-        // AlarmKit expects a Widget Extension whenever an app offers one — without it the
-        // system "may unexpectedly dismiss alarms and fail to alert". Alert-only keeps this
-        // first pass to a single target.
-        let alert = AlarmPresentation.Alert(
-            title: LocalizedStringResource(stringLiteral: title),
-            secondaryButton: nil,
-            secondaryButtonBehavior: nil
-        )
-        let presentation = AlarmPresentation(alert: alert)
-
-        let attributes = AlarmAttributes(
-            presentation: presentation,
-            metadata: RandomizerAlarmMetadata(),
-            tintColor: tintColor
-        )
+        let attributes = makeAttributes(title: title, snoozeMinutes: snoozeMinutes)
 
         let time = AlarmKit.Alarm.Schedule.Relative.Time(hour: hour, minute: minute)
         let recurrence: AlarmKit.Alarm.Schedule.Relative.Recurrence =
@@ -125,7 +107,49 @@ enum AlarmKitScheduler {
             id: id,
             schedule: alarmSchedule,
             attributes: attributes,
-            soundName: soundName
+            soundName: soundName,
+            snoozeMinutes: snoozeMinutes
+        )
+    }
+
+    /// Builds the presentation + attributes, wiring up snooze when an interval is given.
+    ///
+    /// Snooze is AlarmKit's `.countdown` secondary-button behavior: the button re-triggers
+    /// the alarm after `CountdownDuration.postAlert`, and while it's counting down the alarm
+    /// shows its *countdown* presentation. That countdown presentation is what makes a
+    /// Widget Extension necessary — Apple: "AlarmKit expects a widget extension if an app
+    /// supports a countdown presentation. Otherwise, the system may unexpectedly dismiss
+    /// alarms and fail to alert."
+    ///
+    /// No `pauseButton` on the countdown, so no `AlarmPresentation.Paused` is needed: a
+    /// paused state only exists to get back out of a pause.
+    private static func makeAttributes(
+        title: String,
+        snoozeMinutes: Int?
+    ) -> AlarmAttributes<RandomizerAlarmMetadata> {
+        let snoozeButton: AlarmButton? = snoozeMinutes.map { minutes in
+            AlarmButton(
+                text: LocalizedStringResource(stringLiteral: "Snooze \(minutes) min"),
+                textColor: .white,
+                systemImageName: "zzz"
+            )
+        }
+
+        // The stop button is supplied by the system in the iOS 26.1 initializer.
+        let alert = AlarmPresentation.Alert(
+            title: LocalizedStringResource(stringLiteral: title),
+            secondaryButton: snoozeButton,
+            secondaryButtonBehavior: snoozeMinutes == nil ? nil : .countdown
+        )
+
+        let countdown: AlarmPresentation.Countdown? = snoozeMinutes == nil
+            ? nil
+            : AlarmPresentation.Countdown(title: LocalizedStringResource(stringLiteral: "\(title) — snoozed"))
+
+        return AlarmAttributes(
+            presentation: AlarmPresentation(alert: alert, countdown: countdown, paused: nil),
+            metadata: RandomizerAlarmMetadata(label: title),
+            tintColor: tintColor
         )
     }
 
@@ -135,29 +159,22 @@ enum AlarmKitScheduler {
     static func scheduleTestFiring(
         label: String,
         inSeconds seconds: TimeInterval,
-        soundName: String?
+        soundName: String?,
+        snoozeMinutes: Int?
     ) async -> Bool {
         guard await requestAuthorization() else { return false }
 
         let fireDate = Date().addingTimeInterval(max(5, seconds))
-        let alert = AlarmPresentation.Alert(
-            title: LocalizedStringResource(stringLiteral: "Test — \(label)"),
-            secondaryButton: nil,
-            secondaryButtonBehavior: nil
-        )
-        let attributes = AlarmAttributes(
-            presentation: AlarmPresentation(alert: alert),
-            metadata: RandomizerAlarmMetadata(),
-            tintColor: tintColor
-        )
+        let attributes = makeAttributes(title: "Test — \(label)", snoozeMinutes: snoozeMinutes)
 
-        log.info("Scheduling AlarmKit test firing for \(String(describing: fireDate), privacy: .public), sound: \(soundName ?? "<system default>", privacy: .public)")
+        log.info("Scheduling AlarmKit test firing for \(String(describing: fireDate), privacy: .public), sound: \(soundName ?? "<system default>", privacy: .public), snooze: \(snoozeMinutes.map { "\($0)" } ?? "off", privacy: .public)")
 
         return await Self.schedule(
             id: UUID(),
             schedule: .fixed(fireDate),
             attributes: attributes,
-            soundName: soundName
+            soundName: soundName,
+            snoozeMinutes: snoozeMinutes
         )
     }
 
@@ -165,7 +182,8 @@ enum AlarmKitScheduler {
         id: UUID,
         schedule: AlarmKit.Alarm.Schedule,
         attributes: AlarmAttributes<RandomizerAlarmMetadata>,
-        soundName: String?
+        soundName: String?,
+        snoozeMinutes: Int?
     ) async -> Bool {
         let sound: AlertConfiguration.AlertSound
         if let soundName {
@@ -174,11 +192,19 @@ enum AlarmKitScheduler {
             sound = .default
         }
 
-        // NOTE: do not add `appEntityIdentifier:` here — that overload of
-        // `alarm(...)` is iOS 27.0+, while this project targets iOS 26.1. Every
-        // parameter except `attributes:` has a default (`stopIntent`, `secondaryIntent`
-        // default to nil; `sound` defaults to `.default`), so only set what we need.
-        let configuration = AlarmManager.AlarmConfiguration.alarm(
+        // `postAlert` is the snooze interval: "The duration applied after the alarm has
+        // alerted at least once and moves back to the countdown state." `preAlert` is a
+        // pre-fire countdown (timer behavior) and stays nil for an alarm.
+        let countdownDuration: AlarmKit.Alarm.CountdownDuration? = snoozeMinutes.map {
+            AlarmKit.Alarm.CountdownDuration(preAlert: nil, postAlert: TimeInterval($0) * 60)
+        }
+
+        // NOTE: this uses the INITIALIZER rather than the `.alarm(...)` factory, because the
+        // factory takes no `countdownDuration:` and so can't express snooze. Do not add
+        // `appEntityIdentifier:` — that overload is iOS 27.0+, while this project targets
+        // 26.1. Every parameter except `attributes:` has a default.
+        let configuration = AlarmManager.AlarmConfiguration(
+            countdownDuration: countdownDuration,
             schedule: schedule,
             attributes: attributes,
             sound: sound

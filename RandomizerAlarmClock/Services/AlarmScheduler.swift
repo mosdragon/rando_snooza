@@ -15,25 +15,21 @@
 import Foundation
 import os
 
-/// Where an AlarmKit alarm's sound comes from.
-enum AlarmKitSoundSource: String, CaseIterable, Identifiable {
-    /// A song compiled into the app bundle. No pitch/speed randomization.
-    case bundled
-    /// Rendered at schedule time into `Library/Sounds/` with randomized pitch and speed —
-    /// the app's actual premise. `AlertConfiguration.AlertSound.named(_:)` is documented to
-    /// read from both the main bundle and `Library/Sounds`.
-    case randomizedRender
-    /// The system alarm sound. Useful as a control: if this rings and the others don't, the
-    /// problem is the sound file rather than the scheduling.
-    case systemDefault
+/// One candidate the alarm could ring with. Bundled songs and imported library files are
+/// drawn from the same pool; the difference is only whether a conversion is required.
+enum AlarmSoundCandidate {
+    /// A `.caf` compiled into the app bundle — already a valid alert sound, so it can be
+    /// handed to `.named(_:)` as-is.
+    case bundled(BundledAlarmSound)
+    /// An imported file in `Documents/AudioLibrary/`. MP3/M4A are NOT valid alert-sound
+    /// formats and that folder isn't a place `.named(_:)` looks, so these must always be
+    /// rendered into `Library/Sounds` first — randomization or not.
+    case imported(AudioFile)
 
-    var id: String { rawValue }
-
-    var displayName: String {
+    var sourceURL: URL? {
         switch self {
-        case .bundled: return "Bundled song"
-        case .randomizedRender: return "Randomized render"
-        case .systemDefault: return "System default"
+        case .bundled(let sound): return sound.bundleURL
+        case .imported(let file): return file.fileURL
         }
     }
 }
@@ -41,15 +37,6 @@ enum AlarmKitSoundSource: String, CaseIterable, Identifiable {
 enum AlarmScheduler {
 
     static let log = Logger(subsystem: "com.personal.RandomizerAlarmClock", category: "scheduler")
-
-    // MARK: - Sound source preference
-
-    /// Must match the `@AppStorage` key the editor binds to.
-    static let soundSourceKey = "alarmKitSoundSource"
-
-    static var soundSource: AlarmKitSoundSource {
-        AlarmKitSoundSource(rawValue: UserDefaults.standard.string(forKey: soundSourceKey) ?? "") ?? .bundled
-    }
 
     // MARK: - Library/Sounds
 
@@ -90,7 +77,8 @@ enum AlarmScheduler {
         }
 
         let name = soundName(for: alarm)
-        log.info("Scheduling alarm \(id.uuidString, privacy: .public) at \(hour):\(minute), repeatDays=\(String(describing: weekdays), privacy: .public), sound=\(name ?? "<system default>", privacy: .public)")
+        let snooze = alarm.effectiveSnoozeMinutes
+        log.info("Scheduling alarm \(id.uuidString, privacy: .public) at \(hour):\(minute), repeatDays=\(String(describing: weekdays), privacy: .public), sound=\(name ?? "<system default>", privacy: .public), snooze=\(snooze.map { "\($0)" } ?? "off", privacy: .public)")
 
         Task {
             _ = await AlarmKitScheduler.schedule(
@@ -99,7 +87,8 @@ enum AlarmScheduler {
                 hour: hour,
                 minute: minute,
                 weekdays: weekdays,
-                soundName: name
+                soundName: name,
+                snoozeMinutes: snooze
             )
         }
     }
@@ -111,44 +100,57 @@ enum AlarmScheduler {
 
     // MARK: - Sound resolution
 
+    /// Everything this alarm is allowed to ring with: bundled songs it hasn't switched off,
+    /// plus the imported files in its pool.
+    static func candidates(for alarm: Alarm) -> [AlarmSoundCandidate] {
+        let bundled = BundledAlarmSound.all
+            .filter { !alarm.disabledBundledSounds.contains($0.fileName) }
+            .map(AlarmSoundCandidate.bundled)
+        let imported = alarm.soundPool.map(AlarmSoundCandidate.imported)
+        return bundled + imported
+    }
+
     /// The file name to hand `AlertConfiguration.AlertSound.named(_:)`.
     /// Returns nil to mean "use the system default alarm sound".
     static func soundName(for alarm: Alarm) -> String? {
-        switch soundSource {
-        case .systemDefault:
+        let pool = candidates(for: alarm)
+        guard let pick = pool.randomElement() else {
+            log.error("Alarm \(alarm.id.uuidString, privacy: .public) has nothing to draw from (every bundled song disabled and no imported files); using the system default sound.")
             return nil
-
-        case .bundled:
-            guard let pick = BundledAlarmSound.all.randomElement() else {
-                log.error("No bundled sounds in the app bundle; falling back to the system default sound.")
-                return nil
-            }
-            return pick.fileName
-
-        case .randomizedRender:
-            return renderRandomizedSound(for: alarm, namePrefix: "alarmkit")
         }
+
+        // A bundled sound played as-is needs no work at all — it's already a valid alert
+        // sound sitting in the bundle.
+        if case .bundled(let sound) = pick, !alarm.randomizePitchAndSpeed {
+            log.info("Alarm \(alarm.id.uuidString, privacy: .public) will ring with bundled \(sound.fileName, privacy: .public).")
+            return sound.fileName
+        }
+
+        return render(pick, for: alarm)
     }
 
-    /// Renders one randomized sound into `Library/Sounds/` and returns its file name, or nil
-    /// if the render failed.
+    /// Renders a candidate into `Library/Sounds` and returns its file name.
     ///
-    /// Falls back to a bundled song as the render *source* when the alarm's pool is empty,
-    /// so randomized renders work without importing anything first.
-    static func renderRandomizedSound(for alarm: Alarm, namePrefix: String) -> String? {
-        let sourceURL: URL
-        if let poolFile = alarm.soundPool.randomElement() {
-            sourceURL = poolFile.fileURL
-        } else if let bundled = BundledAlarmSound.all.randomElement(), let bundledURL = bundled.bundleURL {
-            log.info("Alarm \(alarm.id.uuidString, privacy: .public) has an empty pool; rendering from bundled \(bundled.fileName, privacy: .public).")
-            sourceURL = bundledURL
-        } else {
-            log.error("No render source available: the alarm's pool is empty and no bundled sound is present.")
+    /// Called for every imported file (they always need converting) and for bundled sounds
+    /// when the alarm has randomization switched on. With randomization off the render is a
+    /// straight format conversion: pitch 0, rate 1.
+    private static func render(_ candidate: AlarmSoundCandidate, for alarm: Alarm) -> String? {
+        guard let sourceURL = candidate.sourceURL else {
+            log.error("Candidate has no readable source URL; using the system default sound.")
             return nil
         }
 
-        let (pitch, rate) = AudioProcessor.randomizedParameters(for: alarm)
-        let fileName = "\(namePrefix)_\(alarm.id.uuidString).caf"
+        // Assigned in branches rather than with a ternary: randomizedParameters returns a
+        // *labelled* tuple, which doesn't unify with a bare (0, 1) in a ternary.
+        let pitch: Float
+        let rate: Float
+        if alarm.randomizePitchAndSpeed {
+            (pitch, rate) = AudioProcessor.randomizedParameters(for: alarm)
+        } else {
+            (pitch, rate) = (0, 1)
+        }
+
+        let fileName = "alarmkit_\(alarm.id.uuidString).caf"
         let outputURL = soundsDirectory.appendingPathComponent(fileName)
         try? FileManager.default.removeItem(at: outputURL)
 
@@ -160,19 +162,17 @@ enum AlarmScheduler {
                 outputURL: outputURL
             )
         } catch {
-            log.error("Randomized render failed: \(error.localizedDescription, privacy: .public)")
+            log.error("Render of \(sourceURL.lastPathComponent, privacy: .public) failed: \(error.localizedDescription, privacy: .public). Falling back to the system default sound.")
             return nil
         }
 
-        log.info("Randomized render ready at Library/Sounds/\(fileName, privacy: .public) from \(sourceURL.lastPathComponent, privacy: .public).")
+        log.info("Alarm \(alarm.id.uuidString, privacy: .public) will ring with Library/Sounds/\(fileName, privacy: .public), rendered from \(sourceURL.lastPathComponent, privacy: .public) (pitch \(Int(pitch)), rate \(String(format: "%.2f", rate), privacy: .public)).")
         return fileName
     }
 
     /// Deletes the renders this alarm left in `Library/Sounds/`.
     static func removeRenderedSounds(for alarm: Alarm) {
-        for prefix in ["alarmkit", "alarmkittest"] {
-            let url = soundsDirectory.appendingPathComponent("\(prefix)_\(alarm.id.uuidString).caf")
-            try? FileManager.default.removeItem(at: url)
-        }
+        let url = soundsDirectory.appendingPathComponent("alarmkit_\(alarm.id.uuidString).caf")
+        try? FileManager.default.removeItem(at: url)
     }
 }

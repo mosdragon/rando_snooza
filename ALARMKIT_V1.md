@@ -72,10 +72,78 @@ Verified against Apple's docs, not recall — several of these cost a build each
   specifically to supporting a *countdown* presentation: "AlarmKit expects a widget
   extension if an app supports a countdown presentation. Otherwise, the system may
   unexpectedly dismiss alarms and fail to alert."
+- **`postAlert` is the snooze interval**, `preAlert` is a pre-fire countdown (timer
+  behavior) and stays nil for an alarm. `Alarm.CountdownDuration(preAlert:postAlert:)` takes
+  both labels explicitly — neither has a default.
+- **`AlarmButton.text` and every presentation `title` are `LocalizedStringResource`**, not
+  `String`. `textColor` is a SwiftUI `Color`.
+- **`AlarmPresentation.Countdown(title:pauseButton:)`** — `pauseButton` defaults to nil.
+- **`AlarmAttributes.ContentState` is `AlarmPresentationState`**, so in the widget
+  `context.state` *is* the presentation state, and `context.attributes` is what the app sent.
+- **There is no API called "snooze" in AlarmKit.** It's `.countdown` throughout;
+  `AlarmPresentation.countdown` is documented as "the content for the snooze or countdown
+  mode".
 - **SwiftUI has no `Section(_ title:, content:, footer:)`** — a string title and a `footer:`
   closure can't be combined; use `content:header:footer:`.
 
 ---
+
+## Sound pool: bundled and imported in one place
+
+There is **one per-alarm pool** holding both kinds of sound, and the alarm draws from it at
+random each time it's saved:
+
+| | Bundled `.caf` | Imported MP3/M4A/WAV |
+|---|---|---|
+| Lives in | the app bundle | `Documents/AudioLibrary/` |
+| Added by | `tools/make_alarm_sound.py` + rebuild | the Sound Library tab, on device |
+| Playable by `.named(_:)` directly | **yes** | **no** — always converted first |
+| Per-alarm on/off | `Alarm.disabledBundledSounds` | `Alarm.soundPool` relationship |
+
+The asymmetry in row 3 is the important one, and it's the answer to "is the sound library
+useless now?": `AlertConfiguration.AlertSound.named(_:)` reads only the app bundle and
+`Library/Sounds`, and accepts only Linear PCM / MA4 / µ-law / a-law. An imported MP3 fails
+both tests, so it can only ring after `AudioProcessor` converts it into `Library/Sounds`.
+**The imported library is therefore entirely dependent on the render path working** — which
+is still unverified on device (open question 2 below). Bundled sounds bypass all of it.
+
+`Alarm.randomizePitchAndSpeed` controls *randomization*, not rendering: an imported file is
+rendered either way (at pitch 0 / rate 1 when randomization is off), while a bundled sound is
+rendered only when randomization is on.
+
+**Why `disabledBundledSounds` is an exclusion list:** "empty" then means "all bundled songs
+are eligible", which is the correct default for a new alarm *and* for one migrated from
+before the property existed — and a song added to the bundle later becomes eligible without
+touching every existing alarm.
+
+## Snooze
+
+Snooze is AlarmKit's `.countdown` secondary-button behavior: the button re-triggers the alarm
+after `Alarm.CountdownDuration.postAlert`, which is set per-alarm from
+`Alarm.snoozeMinutes` (1–60, default 9, toggleable via `isSnoozeEnabled`).
+
+Two consequences worth knowing:
+
+1. **It forced a Widget Extension target.** A snoozed alarm is in its *countdown*
+   presentation, and Apple is explicit: "AlarmKit expects a widget extension if an app
+   supports a countdown presentation. Otherwise, the system may unexpectedly dismiss alarms
+   and fail to alert." `RandomizerAlarmClockWidget/` is that target — a `WidgetBundle` with
+   one `ActivityConfiguration(for: AlarmAttributes<RandomizerAlarmMetadata>.self)` supplying
+   the Lock Screen / StandBy and Dynamic Island views, switching on
+   `context.state.mode` (`.alert` / `.countdown` / `.paused`). Nothing calls
+   `Activity.request()` — `AlarmManager.schedule(id:configuration:)` creates the Live
+   Activity and the system owns its content state.
+2. **It forced the `AlarmConfiguration` initializer** instead of the `.alarm(...)` factory,
+   because the factory has no `countdownDuration:` parameter and so cannot express snooze.
+
+`RandomizerAlarmMetadata` moved to `RandomizerAlarmClock/Shared/` and is listed in **both**
+targets' sources in `project.yml` — the widget must compile the identical type, since it
+receives the same `AlarmAttributes` the app sends. It now carries the alarm's `label` as a
+plain `String`, because `AlarmPresentation.Alert.title` is a `LocalizedStringResource` and
+that's awkward to render in a widget.
+
+No `pauseButton` on the countdown presentation, so no `AlarmPresentation.Paused` is needed —
+a paused state exists only to get back out of a pause.
 
 ## Open design questions
 
@@ -91,20 +159,29 @@ Verified against Apple's docs, not recall — several of these cost a build each
    device; the **Randomized render** option needs the same confirmation. If it doesn't
    play, randomization has to move to build time — ship N pre-rendered variants per song
    and randomize by picking among bundled files (`make_alarm_sound.py` already makes that
-   easy, at ~5 MB per variant).
+   easy, at ~5 MB per variant). **This also decides whether the Sound Library tab and
+   imported files are worth keeping at all** — they have no other route to playback.
 3. **Does AlarmKit loop the sound** until stopped, or play it once and go quiet under a
    still-visible alert? Unverified. It decides whether ~29.5 s snippets are right or
    whether bundled sounds should be short, loopable stings.
-4. **Snooze.** Needs a secondary button with `.countdown` behavior → a countdown
-   presentation → a widget extension target in `project.yml`. The largest remaining piece
-   of UI work.
+4. **Is the widget extension actually satisfying AlarmKit?** Newly added and unverified.
+   If alarms start getting dismissed unexpectedly, or the snooze countdown shows a blank
+   Live Activity, this target is the first place to look. A free personal team has to
+   provision a second bundle id (`…RandomizerAlarmClock.Widget`) for it — that should be
+   automatic, but it's a new thing that can fail.
 
 ## Smaller loose ends
 
-- **No SwiftData migration plan** (`VersionedSchema`). The next model change has the same
-  delete-the-app problem as above.
+- **No SwiftData migration plan** (`VersionedSchema`). The snooze/pool work added four
+  properties (`randomizePitchAndSpeed`, `disabledBundledSounds`, `isSnoozeEnabled`,
+  `snoozeMinutes`), all with defaults in their declarations, which is what lets SwiftData
+  migrate them automatically. Additive changes like these are the safe kind; removals are
+  not.
 - **`Alarm.timeString`** uses a hardcoded `"h:mm a"` rather than a localized style.
-- **No app icon** — `ASSETCATALOG_COMPILER_APPICON_NAME` is set with no `Assets.xcassets`.
+- **App icon** is `Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png`, built
+  from `Temp/app_logo.jpg` (474×480). It's upscaled past 2×, so it is soft at full size —
+  regenerate from a ≥1024px original if one exists. Single universal 1024 image, RGB with no
+  alpha (iOS rejects an app icon with an alpha channel).
 - **`SWIFT_VERSION` is still 5.9.** Moving to the Swift 6 language mode would surface real
   concurrency work around the `Task` blocks that read SwiftData models.
 - **`Temp/`** (the original source audio) is untracked and not in `.gitignore` — decide

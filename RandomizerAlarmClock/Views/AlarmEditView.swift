@@ -21,9 +21,6 @@ struct AlarmEditView: View {
     @State private var didScheduleTest = false
     @State private var alarmKitStatus: String?
 
-    @AppStorage(AlarmScheduler.soundSourceKey) private var soundSourceRaw = AlarmKitSoundSource.bundled.rawValue
-
-    private var soundSource: AlarmKitSoundSource { AlarmKitSoundSource(rawValue: soundSourceRaw) ?? .bundled }
 
     init(alarm: Alarm, isNew: Bool = false) {
         self.alarm = alarm
@@ -58,24 +55,36 @@ struct AlarmEditView: View {
                     HStack {
                         Text("Sound pool")
                         Spacer()
-                        Text("\(alarm.soundPool.count) selected")
+                        Text(alarm.soundPoolSummary)
                             .foregroundStyle(.secondary)
                     }
                 }
+
+                Toggle("Randomize pitch & speed", isOn: $alarm.randomizePitchAndSpeed)
+            } header: {
+                Text("Sound")
             } footer: {
-                if alarm.soundPool.isEmpty {
-                    Text("Pick at least one sound or this alarm won't be scheduled.")
+                if AlarmScheduler.candidates(for: alarm).isEmpty {
+                    Text("Nothing is switched on, so this alarm will ring with the system sound.")
                         .foregroundStyle(.orange)
+                } else if alarm.randomizePitchAndSpeed {
+                    Text("Each save picks one sound at random and re-renders it with a random pitch and speed from the ranges below.")
+                } else {
+                    Text("Each save picks one sound at random and plays it as-is.")
                 }
             }
 
-            RandomizationRangeView(alarm: alarm)
+            if alarm.randomizePitchAndSpeed {
+                RandomizationRangeView(alarm: alarm)
+            }
+
+            snoozeSection
 
             Section {
                 Toggle("Enabled", isOn: $alarm.isEnabled)
             }
 
-            soundSection
+            testFireSection
         }
         .navigationTitle(isNew ? "New Alarm" : "Edit Alarm")
         .navigationBarTitleDisplayMode(.inline)
@@ -90,52 +99,36 @@ struct AlarmEditView: View {
         }
     }
 
-    // MARK: - Engine / test section
+    // MARK: - Snooze / test sections
 
     @ViewBuilder
-    private var soundSection: some View {
+    private var snoozeSection: some View {
         Section {
-            Picker("Alarm sound", selection: $soundSourceRaw) {
-                ForEach(AlarmKitSoundSource.allCases) { option in
-                    Text(option.displayName).tag(option.rawValue)
-                }
-            }
+            Toggle("Snooze", isOn: $alarm.isSnoozeEnabled)
 
-            if soundSource == .bundled {
-                if BundledAlarmSound.all.isEmpty {
-                    Label("No sounds in the app bundle", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.red)
-                        .font(.caption)
-                } else {
-                    ForEach(BundledAlarmSound.all) { sound in
-                        HStack {
-                            Text(sound.displayName)
-                            Spacer()
-                            Text(sound.fileName)
-                                .foregroundStyle(.secondary)
-                        }
-                        .font(.caption)
+            if alarm.isSnoozeEnabled {
+                Stepper(value: $alarm.snoozeMinutes, in: 1...60) {
+                    HStack {
+                        Text("Snooze length")
+                        Spacer()
+                        Text("\(alarm.snoozeMinutes) min")
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
         } header: {
-            Text("Alarm sound")
+            Text("Snooze")
         } footer: {
-            switch soundSource {
-            case .bundled:
-                if BundledAlarmSound.all.isEmpty {
-                    Text("No .caf files were found in the bundle. Run tools/make_alarm_sound.py to add one, then `xcodegen generate` and rebuild.")
-                        .foregroundStyle(.red)
-                } else {
-                    Text("One of the bundled songs is picked at random each time the alarm is saved.")
-                }
-            case .randomizedRender:
-                Text("Renders a fresh take with randomized pitch and speed into Library/Sounds each time the alarm is saved, using this alarm's sound pool — or a bundled song if the pool is empty.")
-            case .systemDefault:
-                Text("The system alarm sound. Useful for isolating whether a problem is the sound file or the scheduling.")
+            if alarm.isSnoozeEnabled {
+                Text("Adds a Snooze button to the alarm alert. Tapping it re-triggers the alarm after \(alarm.snoozeMinutes) minute\(alarm.snoozeMinutes == 1 ? "" : "s").")
+            } else {
+                Text("The alarm alert shows only the system Stop button.")
             }
         }
+    }
 
+    @ViewBuilder
+    private var testFireSection: some View {
         Section {
             Button {
                 testFire()
@@ -148,7 +141,7 @@ struct AlarmEditView: View {
             } else if didScheduleTest {
                 Text("Test scheduled. Lock the phone to see the full-screen alert.")
             } else {
-                Text("Fires once, so delivery can be confirmed without waiting for the alarm time.")
+                Text("Fires once with this alarm's current settings, so delivery and snooze can be checked without waiting for the alarm time.")
             }
         }
     }
@@ -158,11 +151,13 @@ struct AlarmEditView: View {
 
         let soundName = AlarmScheduler.soundName(for: alarm)
         let label = alarm.label
+        let snooze = alarm.effectiveSnoozeMinutes
         Task {
             let ok = await AlarmKitScheduler.scheduleTestFiring(
                 label: label,
                 inSeconds: 20,
-                soundName: soundName
+                soundName: soundName,
+                snoozeMinutes: snooze
             )
             await MainActor.run {
                 didScheduleTest = ok
