@@ -25,6 +25,15 @@ final class Alarm {
     var speedMin: Float
     var speedMax: Float
 
+    /// Alarm loudness, 0.1 ... 1.0, where 1.0 is the sound file untouched.
+    ///
+    /// iOS exposes no way to set an alert sound's volume at fire time, so this is baked into
+    /// a rendered copy of the sound. Consequence worth knowing: any value below 1.0 forces
+    /// the render path even for a bundled song that would otherwise play straight from the
+    /// bundle. It also stacks on top of — it cannot override — the device's own alarm
+    /// volume in Settings → Sounds & Haptics.
+    var volume: Float = 1.0
+
     /// Whether the picked sound is re-rendered with a random pitch and speed before use.
     /// Note this is independent of *rendering*: an imported library file always has to be
     /// converted into Library/Sounds because MP3/M4A aren't valid alert-sound formats.
@@ -61,12 +70,31 @@ final class Alarm {
         self.pitchMaxCents = 200
         self.speedMin = 0.85
         self.speedMax = 1.15
+        self.volume = 1.0
         self.randomizePitchAndSpeed = false
         self.disabledBundledSounds = []
         self.isSnoozeEnabled = true
         self.snoozeMinutes = 9
         self.dateCreated = Date()
         self.soundPool = []
+    }
+
+    /// `volume` as a linear amplitude multiplier.
+    ///
+    /// The slider is mapped through decibels rather than used directly: loudness is
+    /// perceived logarithmically, so a linear multiplier bunches all the useful quietening
+    /// into the bottom of the slider. 100% is 0 dB (untouched) and 10% is -24 dB.
+    var volumeAmplitude: Float {
+        let clamped = min(1, max(0.1, volume))
+        guard clamped < 1 else { return 1 }
+        let decibels = (clamped - 1) / 0.9 * 24
+        return pow(10, decibels / 20)
+    }
+
+    /// True when this alarm's sound has to be re-rendered rather than played from the
+    /// bundle as-is — either to randomize it or to quieten it.
+    var requiresRender: Bool {
+        randomizePitchAndSpeed || volume < 1
     }
 
     /// Snooze length to hand AlarmKit, or nil when snooze is off for this alarm.

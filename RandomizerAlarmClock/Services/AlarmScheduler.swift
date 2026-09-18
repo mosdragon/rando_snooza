@@ -120,8 +120,9 @@ enum AlarmScheduler {
         }
 
         // A bundled sound played as-is needs no work at all — it's already a valid alert
-        // sound sitting in the bundle.
-        if case .bundled(let sound) = pick, !alarm.randomizePitchAndSpeed {
+        // sound sitting in the bundle. Randomization or a volume below 100% both force a
+        // render, because neither can be applied at fire time.
+        if case .bundled(let sound) = pick, !alarm.requiresRender {
             log.info("Alarm \(alarm.id.uuidString, privacy: .public) will ring with bundled \(sound.fileName, privacy: .public).")
             return sound.fileName
         }
@@ -159,6 +160,7 @@ enum AlarmScheduler {
                 inputURL: sourceURL,
                 pitchCents: pitch,
                 rate: rate,
+                gain: alarm.volumeAmplitude,
                 outputURL: outputURL
             )
         } catch {
@@ -166,7 +168,7 @@ enum AlarmScheduler {
             return nil
         }
 
-        log.info("Alarm \(alarm.id.uuidString, privacy: .public) will ring with Library/Sounds/\(fileName, privacy: .public), rendered from \(sourceURL.lastPathComponent, privacy: .public) (pitch \(Int(pitch)), rate \(String(format: "%.2f", rate), privacy: .public)).")
+        log.info("Alarm \(alarm.id.uuidString, privacy: .public) will ring with Library/Sounds/\(fileName, privacy: .public), rendered from \(sourceURL.lastPathComponent, privacy: .public) (pitch \(Int(pitch)), rate \(String(format: "%.2f", rate), privacy: .public), volume \(Int(alarm.volume * 100))%).")
         return fileName
     }
 

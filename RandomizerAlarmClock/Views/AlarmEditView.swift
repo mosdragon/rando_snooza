@@ -61,16 +61,36 @@ struct AlarmEditView: View {
                 }
 
                 Toggle("Randomize pitch & speed", isOn: $alarm.randomizePitchAndSpeed)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Volume")
+                        Spacer()
+                        Text("\(Int(alarm.volume * 100))%")
+                            .foregroundStyle(.secondary)
+                            .font(.footnote)
+                    }
+                    HStack(spacing: 10) {
+                        Image(systemName: "speaker.fill")
+                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                        Slider(value: $alarm.volume, in: 0.1...1.0, step: 0.05)
+                        Image(systemName: "speaker.wave.3.fill")
+                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                    }
+                }
+                .padding(.vertical, 4)
             } header: {
                 Text("Sound")
             } footer: {
                 if AlarmScheduler.candidates(for: alarm).isEmpty {
                     Text("Nothing is switched on, so this alarm will ring with the system sound.")
                         .foregroundStyle(.orange)
-                } else if alarm.randomizePitchAndSpeed {
-                    Text("Each save picks one sound at random and re-renders it with a random pitch and speed from the ranges below.")
+                } else if alarm.requiresRender {
+                    Text("Each save picks one sound at random and re-renders it. Volume is baked into that render — it stacks on top of the device's alarm volume in Settings → Sounds & Haptics rather than overriding it.")
                 } else {
-                    Text("Each save picks one sound at random and plays it as-is.")
+                    Text("Each save picks one sound at random and plays it as-is, at the device's alarm volume.")
                 }
             }
 

@@ -20,6 +20,7 @@
 		78D1EFF4300329BFCD624114 /* AlarmLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7102541E7F74221071BE0EA7 /* AlarmLiveActivity.swift */; };
 		79A45A0F74355676736195B5 /* AlarmEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D63279D316D82BA5510614 /* AlarmEditView.swift */; };
 		830CC353945220DE8C6C2B91 /* RandomizerAlarmMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EA9831DFCABDD42491F15E /* RandomizerAlarmMetadata.swift */; };
+		92D25EEC40C26D8C363C7768 /* billy_mandy.caf in Resources */ = {isa = PBXBuildFile; fileRef = 081B4298B9B54996DA37592C /* billy_mandy.caf */; };
 		984BCDE9CE056627E86D3A4D /* RandomizerAlarmClockWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4EE718294AF26C9EC6789699 /* RandomizerAlarmClockWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A070A5BAF40506E6365430C9 /* ccr_get_low.caf in Resources */ = {isa = PBXBuildFile; fileRef = 6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */; };
 		A58607F7DC6B733AFFCB3992 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */; };
@@ -62,9 +63,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		03D0C477FE041EEC8D4758FD /* johto.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = johto.caf; sourceTree = "<group>"; };
+		03D0C477FE041EEC8D4758FD /* johto.caf */ = {isa = PBXFileReference; path = johto.caf; sourceTree = "<group>"; };
 		06A4EE23A724D998F225E3A4 /* AudioProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessor.swift; sourceTree = "<group>"; };
 		075E1428BECEEC60BF53E583 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		081B4298B9B54996DA37592C /* billy_mandy.caf */ = {isa = PBXFileReference; path = billy_mandy.caf; sourceTree = "<group>"; };
 		0EC2D59883BCC6F8C52B014E /* AlarmScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmScheduler.swift; sourceTree = "<group>"; };
 		1895206D235B759C6C3F5489 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		24EA9831DFCABDD42491F15E /* RandomizerAlarmMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizerAlarmMetadata.swift; sourceTree = "<group>"; };
@@ -74,20 +76,20 @@
 		446DDB7834D6E710173A5839 /* sounds.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = sounds.json; sourceTree = "<group>"; };
 		485ABCBF76AAE33AC314E38C /* RandomizationRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizationRangeView.swift; sourceTree = "<group>"; };
 		4E551F1B727D1F1864ABA221 /* RepeatDayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatDayPicker.swift; sourceTree = "<group>"; };
-		4EE718294AF26C9EC6789699 /* RandomizerAlarmClockWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RandomizerAlarmClockWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EE718294AF26C9EC6789699 /* RandomizerAlarmClockWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = RandomizerAlarmClockWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C57498F95D078E486D86251 /* Alarm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alarm.swift; sourceTree = "<group>"; };
-		657DB9EF8551BF6416EDA683 /* RandomizerAlarmClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RandomizerAlarmClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccr_get_low.caf; sourceTree = "<group>"; };
+		657DB9EF8551BF6416EDA683 /* RandomizerAlarmClock.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RandomizerAlarmClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */ = {isa = PBXFileReference; path = ccr_get_low.caf; sourceTree = "<group>"; };
 		7013227AC812DA1EA5F59A93 /* RandomizerAlarmClockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizerAlarmClockApp.swift; sourceTree = "<group>"; };
 		7102541E7F74221071BE0EA7 /* AlarmLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmLiveActivity.swift; sourceTree = "<group>"; };
 		71E63471558531D981667ADB /* AudioLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryManager.swift; sourceTree = "<group>"; };
 		7F7E8921A7078B8B19DA239D /* BundledAlarmSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledAlarmSound.swift; sourceTree = "<group>"; };
 		90D88415C402AAD1D16777C3 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9F4D611A3084DF43DB5DC1CC /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
-		A907BA6D1EBF63BD6BB28914 /* viva.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = viva.caf; sourceTree = "<group>"; };
+		A907BA6D1EBF63BD6BB28914 /* viva.caf */ = {isa = PBXFileReference; path = viva.caf; sourceTree = "<group>"; };
 		BA6440466ACC0F2B398BC06B /* AlarmListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmListView.swift; sourceTree = "<group>"; };
 		C5776D8D1B2B897A6AFC8B2A /* SoundPoolPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPoolPickerView.swift; sourceTree = "<group>"; };
-		D9D26222B48B04489232EB35 /* dbz_b3.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = dbz_b3.caf; sourceTree = "<group>"; };
+		D9D26222B48B04489232EB35 /* dbz_b3.caf */ = {isa = PBXFileReference; path = dbz_b3.caf; sourceTree = "<group>"; };
 		DB5932E983DFC8BEB7098E98 /* AudioLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLibraryView.swift; sourceTree = "<group>"; };
 		EE5515C7C6D2845B0F835821 /* AudioFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,6 +98,7 @@
 		33AC9C9EA8DF25402033A35C /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				081B4298B9B54996DA37592C /* billy_mandy.caf */,
 				6D500BFCA4352AFD7166F594 /* ccr_get_low.caf */,
 				D9D26222B48B04489232EB35 /* dbz_b3.caf */,
 				03D0C477FE041EEC8D4758FD /* johto.caf */,
@@ -273,9 +276,11 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					6A1FC708E888370CCA00C8F5 = {
+						DevelopmentTeam = 94CJ2KL5G5;
 						ProvisioningStyle = Automatic;
 					};
 					EB677B958F5FF72EE8478BC2 = {
+						DevelopmentTeam = 94CJ2KL5G5;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -306,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4334EF3CBAB0BF602D49AD13 /* Assets.xcassets in Resources */,
+				92D25EEC40C26D8C363C7768 /* billy_mandy.caf in Resources */,
 				A070A5BAF40506E6365430C9 /* ccr_get_low.caf in Resources */,
 				AF65A32D76B63B8BC0C0F23F /* dbz_b3.caf in Resources */,
 				FB82F4019262E0F5628704DF /* johto.caf in Resources */,
@@ -366,8 +372,6 @@
 		299753E4F770DFB7ED011D37 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				INFOPLIST_FILE = RandomizerAlarmClockWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -417,8 +421,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -445,9 +451,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				INFOPLIST_FILE = RandomizerAlarmClock/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -467,9 +471,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				INFOPLIST_FILE = RandomizerAlarmClock/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -487,8 +489,6 @@
 		7088DCA8F2F093903E6F1221 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				INFOPLIST_FILE = RandomizerAlarmClockWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -538,8 +538,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 94CJ2KL5G5;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

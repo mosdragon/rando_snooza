@@ -59,6 +59,10 @@ tools/make_alarm_sound.py --list            # what's bundled, and what it costs
 tools/make_alarm_sound.py --remove wake_up  # drop one
 ```
 
+If alarms come out too loud, note that the default `--normalize peak` pushes every song to
+−0.5 dBFS. `--normalize loudness` (EBU R128, −14 LUFS) is quieter and much more consistent
+across a library, and avoids having to pull every alarm's volume slider down individually.
+
 The script takes anything ffmpeg can read (mp3, m4a, wav, flac, mp4, mov, …), trims it,
 peak-normalizes it, converts it to 16-bit linear PCM CAF, writes it into
 `RandomizerAlarmClock/Resources/Sounds/`, and records a display title in `sounds.json`.
@@ -82,7 +86,7 @@ work, it just plays a system error tone.
   **randomized render** (random pitch/speed written to `Library/Sounds` at save time), or
   the **system default** alarm sound
 - Per-alarm sound pool selected from an imported audio library, plus per-alarm randomized
-  pitch and speed ranges
+  pitch and speed ranges and a per-alarm volume slider
 - Audio import (MP3/M4A/WAV) via the Files picker (iCloud Drive, Google Drive, On My
   iPhone), preview playback, rename, delete
 - "Test fire in 20 seconds" in the alarm editor, for checking delivery without waiting

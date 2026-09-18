@@ -43,7 +43,16 @@ struct AudioProcessor {
 
     /// Renders `inputURL` with the given pitch/rate applied and writes a trimmed .caf to `outputURL`.
     /// Runs entirely offline (no audio hardware needed), so it's fast even for a 3-4 minute source file.
-    static func renderSound(inputURL: URL, pitchCents: Float, rate: Float, outputURL: URL) throws {
+    /// - Parameter gain: linear amplitude multiplier, 0...1. Baked into the rendered file,
+    ///   because there is no API to set an alert sound's volume at fire time — AlarmKit
+    ///   plays whatever is in the file at the device's alarm volume. 1 = unchanged.
+    static func renderSound(
+        inputURL: URL,
+        pitchCents: Float,
+        rate: Float,
+        gain: Float = 1,
+        outputURL: URL
+    ) throws {
         let inputFile: AVAudioFile
         do {
             inputFile = try AVAudioFile(forReading: inputURL)
@@ -65,6 +74,10 @@ struct AudioProcessor {
         engine.connect(player, to: pitchUnit, format: processingFormat)
         engine.connect(pitchUnit, to: engine.mainMixerNode, format: processingFormat)
         engine.connect(engine.mainMixerNode, to: engine.outputNode, format: processingFormat)
+
+        // Attenuation only — boosting above 1 would clip, and the source files are already
+        // peak-normalized close to full scale by tools/make_alarm_sound.py.
+        engine.mainMixerNode.outputVolume = min(1, max(0, gain))
 
         do {
             try engine.enableManualRenderingMode(.offline, format: processingFormat, maximumFrameCount: 4096)
@@ -180,7 +193,7 @@ struct AudioProcessor {
         let bytes = (try? FileManager.default.attributesOfItem(atPath: outputURL.path))
             .flatMap { $0[.size] as? Int } ?? 0
         let renderedSeconds = Double(framesRendered) / sampleRate
-        log.info("Rendered \(outputURL.lastPathComponent, privacy: .public): \(renderedSeconds, format: .fixed(precision: 2))s, \(bytes) bytes.")
+        log.info("Rendered \(outputURL.lastPathComponent, privacy: .public): \(renderedSeconds, format: .fixed(precision: 2))s, \(bytes) bytes, gain \(String(format: "%.2f", engine.mainMixerNode.outputVolume), privacy: .public).")
 
         guard bytes > 0, framesRendered > 0 else {
             log.error("Render produced an empty file for \(inputURL.lastPathComponent, privacy: .public).")

@@ -107,6 +107,28 @@ both tests, so it can only ring after `AudioProcessor` converts it into `Library
 **The imported library is therefore entirely dependent on the render path working** — which
 is still unverified on device (open question 2 below). Bundled sounds bypass all of it.
 
+## Volume
+
+`Alarm.volume` (0.1–1.0) is **baked into a rendered copy of the sound**, because iOS exposes
+no way to set an alert sound's volume at fire time — AlarmKit plays whatever is in the file,
+at the device's alarm volume. Two consequences:
+
+- **Any volume below 100% forces the render path**, even for a bundled song that would
+  otherwise play straight from the bundle. `Alarm.requiresRender` is
+  `randomizePitchAndSpeed || volume < 1`. So if the `Library/Sounds` render path turns out
+  not to work (open question 2), the volume slider silently stops working with it.
+- **It stacks on top of the device's alarm volume**, it cannot override it. A user with
+  Settings → Sounds & Haptics turned down still gets a quiet alarm.
+
+The slider is mapped through decibels (`volumeAmplitude`: 100% = 0 dB, 10% = −24 dB) rather
+than used as a raw multiplier, because loudness is perceived logarithmically and a linear
+multiplier bunches everything useful into the bottom of the slider.
+
+Upstream cause of alarms being *too* loud in the first place:
+`tools/make_alarm_sound.py` defaults to `--normalize peak`, which pushes every song to
+−0.5 dBFS. `--normalize loudness` (EBU R128, −14 LUFS) produces quieter and far more
+consistent levels across songs, and is the better default for a library of alarm sounds.
+
 `Alarm.randomizePitchAndSpeed` controls *randomization*, not rendering: an imported file is
 rendered either way (at pitch 0 / rate 1 when randomization is off), while a bundled sound is
 rendered only when randomization is on.
