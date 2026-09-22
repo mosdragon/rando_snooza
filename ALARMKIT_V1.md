@@ -167,6 +167,14 @@ that's awkward to render in a widget.
 No `pauseButton` on the countdown presentation, so no `AlarmPresentation.Paused` is needed —
 a paused state exists only to get back out of a pause.
 
+## Known bugs
+
+- **A snoozed alarm can't be stopped and counts down forever** — see `BUG_STUCK_SNOOZE.md`.
+  Three code defects found: test firings use a throwaway UUID the app never stores (so a
+  snoozed test alarm is permanently unaddressable), teardown only ever calls `cancel(id:)`
+  and never `stop(id:)`, and `reschedule` doesn't tear down before rescheduling. The
+  countdown presentation also has no buttons or intents, so there is nothing to tap.
+
 ## Open design questions
 
 1. **Per-firing randomization.** One AlarmKit alarm covers a whole weekly recurrence and
